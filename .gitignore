@@ -1,0 +1,8 @@
+# мусор операционных систем
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# рабочие документы колоды: остаются только на этом компьютере
+koloda-svod.md
+koloda-dopolnenie.md

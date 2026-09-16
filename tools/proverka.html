@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Проверка сборки</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 24px; max-width: 900px; }
+  h1 { font: 400 24px/1.2 Georgia, serif; }
+  h2 { font: 400 19px/1.2 Georgia, serif; margin: 32px 0 8px; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
+  td, th { text-align: left; padding: 5px 10px 5px 0; border-bottom: 1px solid #E3E8EC; vertical-align: top; }
+  td:first-child { width: 55%; }
+  .ok { color: #1F7A3D; }
+  .no { color: #A82020; font-weight: 600; }
+  .note { color: #5A6B7B; }
+  pre { background: #F3F6F8; padding: 10px; overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>Проверка сборки</h1>
+<p class="note">Открывать с того же адреса, что и сайт: <code>/tools/proverka.html</code>.
+Проверяются колода, расчёт света, вывод погодных тегов, правила выдачи, размеры и контрасты
+на экране телефона и отсутствие вовлекающих механик.</p>
+<p class="note">Страница снимает service worker сайта, чтобы мерить текущую сборку, а не
+кэш. Офлайн-кэш соберётся заново при следующем заходе на сайт.</p>
+<div id="out">Считаю…</div>
+
+<script src="../cards.js"></script>
+<script src="../js/sun.js"></script>
+<script src="../js/weather.js"></script>
+<script src="../js/store.js"></script>
+<script src="../js/deck.js"></script>
+<script>
+/* Если сайт успел поставить service worker, он отдаёт файлы из кэша, и проверять
+   было бы нечего. Снимаем его и перезагружаемся: кэш соберётся заново при следующем
+   заходе на сам сайт. */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function (regs) {
+    if (!regs.length) return;
+    Promise.all(regs.map(function (r) { return r.unregister(); }))
+      .then(function () { return caches.keys(); })
+      .then(function (keys) {
+        return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+      })
+      .then(function () { location.reload(); });
+  });
+}
+</script>
+<script>
+(function () {
+  'use strict';
+  var K = window.KOLODA;
+  var SPB = { lat: 59.9386, lon: 30.3141 };
+  var MSK = { lat: 55.7558, lon: 37.6173 };
+  var KUP = { lat: 59.831, lon: 30.376 };      // Купчино, массовая застройка
+  var NN  = { lat: 56.3287, lon: 44.0020 };    // город вне наборов
+
+  var html = [];
+  var failures = 0;
+
+  function section(title) { html.push('<h2>' + title + '</h2><table>'); }
+  function endSection() { html.push('</table>'); }
+  function check(name, got, want) {
+    var g = JSON.stringify(got), w = JSON.stringify(want);
+    var ok = g === w;
+    if (!ok) failures++;
+    html.push('<tr><td>' + name + '</td><td class="' + (ok ? 'ok' : 'no') + '">' +
+      (ok ? 'так' : 'НЕ ТАК: ' + g + ' вместо ' + w) + '</td></tr>');
+  }
+  function info(name, value) {
+    html.push('<tr><td>' + name + '</td><td class="note">' +
+      (typeof value === 'string' ? value : JSON.stringify(value)) + '</td></tr>');
+  }
+
+  function loc(y, m, d, hh, mm) { return new Date(Date.UTC(y, m - 1, d, hh - 3, mm)); }
+  function ctx(o) {
+    var base = { mode: 'наружу', level: 1, age: '4-5', place: SPB, light: 'темнота',
+                 season: 'осень', weather: null, seen: {}, sessions: 9,
+                 today: '2026-11-15', exclude: [] };
+    for (var k in o) base[k] = o[k];
+    return base;
+  }
+  function ids(list) { return list.map(function (c) { return c.id; }).sort(); }
+  function count(pred) { return K.filter(pred).length; }
+
+  /* ——— колода ——— */
+  section('Колода');
+  check('всего карт', K.length, 180);
+  check('наружу', count(function (c) { return c.mode === 'наружу'; }), 68);
+  check('читать место', count(function (c) { return c.mode === 'читать-место'; }), 36);
+  check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 44);
+  check('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 16);
+  check('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 16);
+  check('набор Петербурга', count(function (c) { return c.cityPack === 'спб'; }), 7);
+  check('набор Москвы', count(function (c) { return c.cityPack === 'мск'; }), 7);
+  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 180);
+  check('у каждой карты есть текст и оборот',
+        count(function (c) { return c.text && c.back; }), 180);
+  check('у всех «наружу» есть уровень',
+        count(function (c) { return c.mode === 'наружу' && c.level; }), 68);
+  check('у всех «совместное внимание» есть возраст',
+        count(function (c) { return c.mode === 'совместное-внимание' && c.age; }), 44);
+  check('у всех «совместное внимание» есть «если не пошло»',
+        count(function (c) { return c.mode === 'совместное-внимание' && c.fallback; }), 44);
+  check('уровни «наружу»', [1, 2, 3].map(function (l) {
+    return count(function (c) { return c.mode === 'наружу' && c.level === l; });
+  }), [24, 30, 14]);
+  check('возрасты', ['2-3', '4-5', '6-8', '9-12'].map(function (a) {
+    return count(function (c) { return c.age === a; });
+  }), [10, 12, 12, 10]);
+  info('требуют памяти о месте',
+       K.filter(function (c) { return c.needsHistory; }).map(function (c) { return c.id; }));
+  endSection();
+
+  /* ——— свет ——— */
+  section('Свет');
+  check('Петербург 21.06 в 21:00 — высота солнца',
+        Sun.altitude(loc(2026, 6, 21, 21, 0), SPB.lat, SPB.lon).toFixed(1), '6.6');
+  var dec = 0;
+  for (var h = 0; h < 24; h++) {
+    var a = Sun.altitude(loc(2026, 12, 21, h, 0), SPB.lat, SPB.lon);
+    if (a > dec) dec = a;
+  }
+  check('Петербург 21.12 — максимум за день', dec.toFixed(1), '6.6');
+  check('Петербург 15.11 в 18:30', Sun.category(loc(2026, 11, 15, 18, 30), SPB), 'темнота');
+  check('Москва 20.09 в 19:00', Sun.category(loc(2026, 9, 20, 19, 0), MSK), 'сумерки');
+  check('Москва 15.06 в 13:00', Sun.category(loc(2026, 6, 15, 13, 0), MSK), 'день');
+  check('без координат света нет', Sun.category(new Date(), null), null);
+  check('пороги', [Sun.categoryByAltitude(11), Sun.categoryByAltitude(5),
+                   Sun.categoryByAltitude(-3), Sun.categoryByAltitude(-7)],
+        ['день', 'низкое-солнце', 'сумерки', 'темнота']);
+  check('сезон 15 января', Sun.season(loc(2026, 1, 15, 12, 0)), 'зима');
+  check('сезон 15 октября', Sun.season(loc(2026, 10, 15, 12, 0)), 'осень');
+  endSection();
+
+  /* ——— погода ——— */
+  section('Погода');
+  var times = [];
+  for (var i = 0; i < 30; i++) {
+    var d = new Date(Date.UTC(2026, 10, 15, 0, 0));
+    d.setUTCHours(i);
+    times.push(d.toISOString().slice(0, 16));
+  }
+  function fill(v) { return times.map(function () { return v; }); }
+  function answer(cur, hourly) {
+    var c = { time: times[25] };
+    for (var k in cur) c[k] = cur[k];
+    var hh = { time: times };
+    for (var j in hourly) hh[j] = hourly[j];
+    return { current: c, hourly: hh };
+  }
+
+  check('мороз, наст, ясно, сухо', Weather.tags(answer(
+    { temperature_2m: -7, relative_humidity_2m: 80, precipitation: 0, cloud_cover: 10,
+      wind_speed_10m: 2, snow_depth: 0.12 },
+    { temperature_2m: fill(-8), precipitation: fill(0), snowfall: fill(0), visibility: fill(20000) })),
+    ['ясно', 'сухо', 'мороз', 'наст']);
+
+  check('снегопад и свежий снег', Weather.tags(answer(
+    { temperature_2m: -2, relative_humidity_2m: 92, precipitation: 0.6, cloud_cover: 95,
+      wind_speed_10m: 3, snow_depth: 0.05 },
+    { temperature_2m: fill(-3), precipitation: fill(0.4), snowfall: fill(0.3), visibility: fill(4000) })),
+    ['облачно', 'снег', 'мороз', 'свежий-снег']);
+
+  var rain = fill(0); rain[24] = 1.2;
+  check('после дождя', Weather.tags(answer(
+    { temperature_2m: 9, relative_humidity_2m: 85, precipitation: 0, cloud_cover: 60,
+      wind_speed_10m: 1, snow_depth: 0 },
+    { temperature_2m: fill(9), precipitation: rain, snowfall: fill(0), visibility: fill(12000) })),
+    ['сухо', 'после-дождя']);
+
+  var thaw = times.map(function (_, i) { return i < 18 ? -5 : 2; });
+  check('оттепель', Weather.tags(answer(
+    { temperature_2m: 2, relative_humidity_2m: 88, precipitation: 0, cloud_cover: 80,
+      wind_speed_10m: 1, snow_depth: 0 },
+    { temperature_2m: thaw, precipitation: fill(0), snowfall: fill(0), visibility: fill(8000) })),
+    ['облачно', 'сухо', 'оттепель']);
+
+  check('туман', Weather.tags(answer(
+    { temperature_2m: 3, relative_humidity_2m: 98, precipitation: 0, cloud_cover: 100,
+      wind_speed_10m: 0.5, snow_depth: 0 },
+    { temperature_2m: fill(3), precipitation: fill(0), snowfall: fill(0), visibility: fill(400) })),
+    ['облачно', 'сухо', 'туман']);
+
+  check('сломанный ответ не ломает отбор', Weather.tags(null), null);
+  endSection();
+
+  /* ——— выдача ——— */
+  section('Правила выдачи');
+  var darkPool = Deck.pool(K, ctx({ level: 2, weather: ['ясно', 'сухо'] }));
+  check('свет не смягчается даже при смягчении погоды',
+        darkPool.every(function (c) {
+          return c.light.indexOf('темнота') >= 0 || c.light.indexOf('неважно') >= 0;
+        }), true);
+
+  check('сезон соблюдается',
+        Deck.pool(K, ctx({ level: 2, season: 'лето', light: 'день' })).every(function (c) {
+          return c.seasons.indexOf('любой') >= 0 || c.seasons.indexOf('лето') >= 0;
+        }), true);
+
+  check('городской набор подмешивается в Петербурге',
+        ids(Deck.pool(K, ctx({ mode: 'читать-место', light: 'день' })))
+          .filter(function (id) { return id.indexOf('СПб') === 0; }).length, 7);
+  check('в Москве не выдаётся петербургский набор',
+        ids(Deck.pool(K, ctx({ mode: 'читать-место', light: 'день', place: MSK })))
+          .filter(function (id) { return id.indexOf('СПб') === 0; }).length, 0);
+  check('вне Москвы и Петербурга — только универсальные',
+        ids(Deck.pool(K, ctx({ mode: 'читать-место', light: 'день', place: NN })))
+          .every(function (id) { return id.indexOf('ЧМ') === 0; }), true);
+  check('в массовой застройке нет исторического центра',
+        Deck.pool(K, ctx({ mode: 'читать-место', light: 'день', place: KUP }))
+          .every(function (c) { return c.buildingType !== 'исторический-центр'; }), true);
+
+  var histSeen = {};
+  var withHistory = false, withoutHistory = false;
+  for (var n = 0; n < 300; n++) {
+    var a = Deck.pick(K, ctx({ level: 1, sessions: 0 }));
+    var b = Deck.pick(K, ctx({ level: 1, sessions: 5 }));
+    if (a && a.needsHistory) withoutHistory = true;
+    if (b && b.needsHistory) withHistory = true;
+  }
+  check('карта памяти места не выдаётся новичку', withoutHistory, false);
+  check('карта памяти места выдаётся после трёх сессий', withHistory, true);
+
+  var pool = Deck.pool(K, ctx({ level: 2 }));
+  var seen = {};
+  pool.forEach(function (c, i) { if (i > 0) seen[c.id] = '2026-11-13'; });
+  check('показанная на днях не повторяется, пока есть другие',
+        Deck.pick(K, ctx({ level: 2, seen: seen })).id, pool[0].id);
+
+  var seenAll = {};
+  pool.forEach(function (c, i) { seenAll[c.id] = i === 1 ? '2026-10-20' : '2026-11-14'; });
+  check('когда все показаны — берётся самая давняя, а не пустота',
+        Deck.pick(K, ctx({ level: 2, seen: seenAll })).id, pool[1].id);
+
+  check('пустой пул возвращает null, а не ошибку',
+        Deck.pick(K, ctx({ mode: 'совместное-внимание', age: 'нет такого' })), null);
+  check('сумерки у «Читать место» вне городов больше не пусты',
+        Deck.pool(K, ctx({ mode: 'читать-место', light: 'сумерки', place: NN })).length >= 5, true);
+  check('в темноте у «Читать место» вне городов есть чем жить',
+        Deck.pool(K, ctx({ mode: 'читать-место', place: NN })).length >= 8, true);
+  check('без координат свет не фильтрует',
+        Deck.pool(K, ctx({ level: 2, light: null, place: null })).length >
+        Deck.pool(K, ctx({ level: 2 })).length, true);
+  endSection();
+
+  /* ——— ноябрьский вечер ——— */
+  section('Ноябрьский вечер в Петербурге, 18:30');
+  var days = [];
+  for (var dd = 1; dd <= 30; dd++) days.push(new Date(Date.UTC(2026, 10, dd, 15, 30)));
+  var lights = {};
+  days.forEach(function (dt) { lights[Sun.category(dt, SPB)] = true; });
+  info('свет', Object.keys(lights).join(', '));
+
+  function month(mode, extra) {
+    var seenM = {}, got = [], empty = 0;
+    days.forEach(function (dt) {
+      var today = Store.dayKey(dt);
+      var o = ctx({ mode: mode, light: Sun.category(dt, SPB), season: Sun.season(dt),
+                    weather: ['облачно', 'сухо', 'мороз'], seen: seenM, today: today });
+      for (var k in extra) o[k] = extra[k];
+      var c = Deck.pick(K, o);
+      if (!c) { empty++; return; }
+      seenM[c.id] = today;
+      if (got.indexOf(c.id) < 0) got.push(c.id);
+    });
+    return { разных: got.length, пусто: empty };
+  }
+  [['наружу', { level: 1 }], ['наружу', { level: 2 }], ['наружу', { level: 3 }],
+   ['читать-место', {}], ['совместное-внимание', { age: '2-3' }],
+   ['совместное-внимание', { age: '4-5' }], ['совместное-внимание', { age: '6-8' }],
+   ['совместное-внимание', { age: '9-12' }], ['с-собакой', {}], ['полевой-дневник', {}]
+  ].forEach(function (pair) {
+    var r = month(pair[0], pair[1]);
+    var label = pair[0] + (pair[1].level ? ' ур. ' + pair[1].level : '') +
+                (pair[1].age ? ' ' + pair[1].age : '');
+    var bad = r.пусто > 0;
+    if (bad) failures++;
+    html.push('<tr><td>' + label + '</td><td class="' + (bad ? 'no' : 'note') + '">' +
+      'разных карт за 30 вечеров: ' + r.разных +
+      (bad ? ' · пустых выдач: ' + r.пусто : '') + '</td></tr>');
+  });
+  endSection();
+
+  /* ——— вовлекающие механики ——— */
+  section('Чего в интерфейсе быть не должно');
+  var banned = ['балл', 'очк', 'достижен', 'рейтинг', 'streak', 'серия подряд',
+                'дней подряд', 'поздрав', 'молодец', 'отлично!', 'уровень прогресса',
+                'напомин', 'уведомл', 'подписк', 'регистрац', 'войти', 'профиль',
+                'синхрониз', 'аналитик', 'выполнено карточек', 'пропущено',
+                'станет спокойнее', 'снижает тревож'];
+  fetch('../index.html').then(function (r) { return r.text(); }).then(function (src) {
+    var text = src.replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g, ' ').toLowerCase();
+    var words = text.split(/[^a-zа-яё]+/i).filter(Boolean);
+    var found = banned.filter(function (w) {
+      if (w.indexOf(' ') >= 0) return text.indexOf(w) >= 0;        // фразы целиком
+      return words.some(function (t) { return t.indexOf(w) === 0; });  // начало слова
+    });
+    check('запрещённые слова в разметке', found, []);
+    var scripts = src.match(/<script[^>]*src="([^"]+)"/g) || [];
+    var outside = scripts.filter(function (s) { return /https?:/.test(s); });
+    check('сторонние скрипты', outside, []);
+    check('внешние шрифты', /fonts\.googleapis|@import/.test(src), false);
+    endSection();
+    layout();
+  }).catch(function () {
+    html.push('<tr><td>разметку не прочитать</td><td class="note">' +
+      'открыто с file:// — проверка слов пропущена</td></tr>');
+    endSection();
+    finish();
+  });
+
+  /* ——— размеры и контрасты ———
+     Страница открывается в кадре шириной с телефон, и всё меряется по-настоящему. */
+
+  function luminance(color) {
+    var m = color.match(/\d+/g);
+    if (!m) return 0;
+    var v = m.slice(0, 3).map(function (x) {
+      x = x / 255;
+      return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  }
+
+  function contrast(a, b) {
+    var l1 = luminance(a), l2 = luminance(b);
+    return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 10) / 10;
+  }
+
+  function layout() {
+    section('Размеры и контрасты на экране 375 px');
+    var frame = document.createElement('iframe');
+    frame.src = '../index.html';
+    frame.setAttribute('title', 'проверяемая страница');
+    frame.style.cssText =
+      'position:absolute;left:-10000px;top:0;width:375px;height:812px;border:0;';
+    frame.addEventListener('load', function () {
+      try { measure(frame); }
+      catch (e) {
+        html.push('<tr><td>кадр не измерить</td><td class="note">' + e.message + '</td></tr>');
+      }
+      frame.remove();
+      endSection();
+      finish();
+    });
+    frame.addEventListener('error', function () {
+      html.push('<tr><td>кадр не открылся</td><td class="note">проверка пропущена</td></tr>');
+      endSection();
+      finish();
+    });
+    document.body.appendChild(frame);
+  }
+
+  function measure(frame) {
+    var doc = frame.contentDocument;
+    var win = frame.contentWindow;
+    var root = doc.documentElement;
+
+    // цели нажатия на всех экранах
+    var small = [];
+    var screens = doc.querySelectorAll('.screen');
+    for (var i = 0; i < screens.length; i++) {
+      var sc = screens[i];
+      var was = sc.hidden;
+      sc.hidden = false;
+      var items = sc.querySelectorAll('button, input, textarea, summary');
+      for (var j = 0; j < items.length; j++) {
+        var box = items[j].getBoundingClientRect();
+        if (box.height > 0 && box.height < 56) {
+          var label = items[j].textContent.trim().split(String.fromCharCode(10))[0];
+          small.push(sc.getAttribute('data-screen') + ': ' +
+            (label || items[j].id).slice(0, 18) +
+            ' — ' + Math.round(box.height) + ' px');
+        }
+      }
+      sc.hidden = was;
+    }
+    check('цели нажатия мельче 56 px', small, []);
+
+    // кегль задания
+    var card = doc.getElementById('card-text');
+    var size = parseFloat(win.getComputedStyle(card).fontSize);
+    check('кегль задания не меньше 20 px', size >= 20, true);
+
+    // контрасты в обеих темах
+    var wasTheme = root.getAttribute('data-theme');
+    ['dark', 'light'].forEach(function (theme) {
+      root.setAttribute('data-theme', theme);
+      var cs = win.getComputedStyle(root);
+      var v = function (name) { return cs.getPropertyValue(name).trim(); };
+      var probe = doc.createElement('span');
+      doc.body.appendChild(probe);
+      var resolve = function (token) {
+        probe.style.color = 'var(' + token + ')';
+        return win.getComputedStyle(probe).color;
+      };
+      var bg = resolve('--bg'), plate = resolve('--plate'), text = resolve('--text');
+      var muted = resolve('--muted'), ink = resolve('--accent-ink');
+      var accent = resolve('--accent'), on = resolve('--on-accent');
+      probe.remove();
+      var name = theme === 'dark' ? 'тёмная' : 'светлая';
+      var pairs = [
+        ['текст на фоне', text, bg],
+        ['текст на плашке', text, plate],
+        ['приглушённый на фоне', muted, bg],
+        ['приглушённый на плашке', muted, plate],
+        ['акцентный текст на плашке', ink, plate],
+        ['главная кнопка', on, accent]
+      ];
+      pairs.forEach(function (pair) {
+        var ratio = contrast(pair[1], pair[2]);
+        var ok = ratio >= 4.5;
+        if (!ok) failures++;
+        html.push('<tr><td>' + name + ': ' + pair[0] + '</td><td class="' +
+          (ok ? 'ok' : 'no') + '">' + ratio.toFixed(1) + ':1' +
+          (ok ? '' : ' — мало') + '</td></tr>');
+      });
+    });
+    if (wasTheme) root.setAttribute('data-theme', wasTheme);
+  }
+
+  function finish() {
+    var head = failures === 0
+      ? '<p class="ok"><strong>Всё сходится.</strong></p>'
+      : '<p class="no"><strong>Расхождений: ' + failures + '.</strong></p>';
+    document.getElementById('out').innerHTML = head + html.join('');
+  }
+})();
+</script>
+</body>
+</html>
