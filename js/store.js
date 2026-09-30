@@ -41,7 +41,8 @@
     theme: 'auto',
     place: null,      // {lat, lon, name, source: 'geo' | 'city'}
     sessions: 0,
-    lastDay: null
+    lastDay: null,
+    recent: []        // три последние выдачи: звуковая карточка или нет
   };
 
   function state() {
@@ -91,6 +92,14 @@
     return n;
   }
 
+  /* Хвост из трёх выдач — только чтобы не выдавать звуковые подряд.
+     Ни счётчиком, ни историей это не является и пользователю не показывается. */
+  function noteIssued(isSound) {
+    var list = (state().recent || []).concat([!!isSound]).slice(-3);
+    patch({ recent: list });
+    return list;
+  }
+
   function diary() { return read(K_DIARY, []) || []; }
 
   function addEntry(text, cardId) {
@@ -114,6 +123,7 @@
     seen: seen,
     markSeen: markSeen,
     noteSession: noteSession,
+    noteIssued: noteIssued,
     diary: diary,
     addEntry: addEntry,
     wipe: wipe,

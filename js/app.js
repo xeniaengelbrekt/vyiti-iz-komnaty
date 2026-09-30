@@ -134,8 +134,16 @@
       seen: Store.seen(),
       sessions: s.sessions,
       today: Store.dayKey(now),
+      recent: s.recent || [],
       exclude: skipped
     };
+  }
+
+  /* Подсказка раскрыта сразу на детских ступенях 2–3 и 4–5. */
+  function alwaysOpenHint(card) {
+    if (card.hintAlwaysVisible) return true;
+    if (card.mode !== 'совместное-внимание') return false;
+    return card.age === '2-3' || card.age === '4-5';
   }
 
   function showCard(card) {
@@ -159,7 +167,9 @@
     $('btn-another').textContent = 'Другую';
     if (card.fallback) {
       $('card-hint-text').textContent = card.fallback;
-      hint.open = false;
+      /* С двухлетним читать некогда: пример нужен до попытки, а не после.
+         Старшим ступеням подсказка по-прежнему под ссылкой. */
+      hint.open = alwaysOpenHint(card);
       hint.hidden = false;
     } else {
       hint.hidden = true;
@@ -176,6 +186,7 @@
         skipped = [];
         card = Deck.pick(cards, context());
       }
+      if (card) Store.noteIssued(Deck.isSound(card));
       showCard(card);
     });
   }
@@ -200,7 +211,10 @@
     showBack();
   }
 
+  /* Оборот и конец — один экран. Сверху задание мелко: человек ходил
+     десять минут и успел забыть формулировку, а объяснение без неё повисает. */
   function showBack() {
+    $('done-task').textContent = current ? current.text : '';
     $('back-title').textContent = current ? current.title : '';
     $('back-text').textContent = current ? current.back : '';
     show('back');
@@ -302,7 +316,6 @@
     $('btn-take').addEventListener('click', function () { take(true); });
     $('btn-done').addEventListener('click', done);
     $('btn-another').addEventListener('click', another);
-    $('btn-back-next').addEventListener('click', function () { show('end'); });
     $('btn-more').addEventListener('click', function () { take(true); });
 
     $('btn-geo').addEventListener('click', askGeolocation);
@@ -364,7 +377,7 @@
     }
     /* Свет меняется, пока страница открыта: к вечеру тема должна догонять. */
     setInterval(function () {
-      if (activeScreen === 'start' || activeScreen === 'end') applyTheme();
+      if (activeScreen === 'start' || activeScreen === 'back') applyTheme();
     }, 5 * 60 * 1000);
   }
 

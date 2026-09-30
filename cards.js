@@ -4,8 +4,8 @@ window.KOLODA = [
   "id": "НАР-01",
   "mode": "наружу",
   "title": "Что ярче сейчас",
-  "text": "Найдите красное пятно и синее примерно одной величины. Решите, какое из них сейчас кажется ярче. Днём ответ был бы обратным.",
-  "back": "При переходе от колбочек к палочкам чувствительность смещается к коротким волнам: синее светлеет, красное темнеет. Это называется эффектом Пуркинье и заметно только в сумерках.",
+  "text": "Найдите что-то красное и что-то синее примерно одного размера. Что из них сейчас ярче?",
+  "back": "Днём ответ был бы обратным. При переходе от колбочек к палочкам чувствительность смещается к коротким волнам: синее светлеет, красное темнеет. Это называется эффектом Пуркинье и заметно только в сумерках.",
   "level": 1,
   "age": null,
   "light": [
@@ -17,9 +17,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два пятна и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -30,7 +32,7 @@ window.KOLODA = [
   "id": "НАР-02",
   "mode": "наружу",
   "title": "Угадать цвет",
-  "text": "Назовите цвет трёх машин подряд, не подходя ближе. Проверьте себя на обратном пути.",
+  "text": "Назовите цвет трёх машин, не подходя ближе. Проверьте, когда будете проходить мимо.",
   "back": "Цветовое зрение отказывает раньше контрастного: форма ещё читается, а цвет уже достраивается по памяти и ожиданию.",
   "level": 1,
   "age": null,
@@ -43,9 +45,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три машины и счёт попаданий",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -56,7 +60,7 @@ window.KOLODA = [
   "id": "НАР-03",
   "mode": "наружу",
   "title": "Где кончается цвет",
-  "text": "Найдите предмет, который ещё различим по цвету, и предмет, который читается уже только силуэтом. Между ними не больше двадцати шагов.",
+  "text": "Найдите предмет, у которого ещё виден цвет, и предмет, который виден только силуэтом. Между ними не больше двадцати шагов.",
   "back": "Колбочкам нужно больше света, чем палочкам, поэтому цвет исчезает раньше формы. Граница между двумя предметами — это граница между двумя типами зрения.",
   "level": 1,
   "age": null,
@@ -69,9 +73,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два предмета",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -82,7 +88,7 @@ window.KOLODA = [
   "id": "НАР-04",
   "mode": "наружу",
   "title": "Косой свет",
-  "text": "Найдите последнее место, куда ещё достаёт солнце. Постойте в нём, считая до двадцати, потом найдите следующее такое же.",
+  "text": "Найдите место, куда ещё достаёт солнце, а в двух шагах от него уже тень. Постойте в освещённом, считая до двадцати.",
   "back": "Тело здесь измерительный прибор, а не объект наблюдения: карта про то, как устроено пространство, а не про то, что вы чувствуете.",
   "level": 1,
   "age": null,
@@ -95,9 +101,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "температура",
   "criterion": "два места, счёт до двадцати",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -121,9 +129,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одно число и один объект",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -147,9 +157,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "счёт окон",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -173,9 +185,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "измерение, прогноз, проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -186,7 +200,7 @@ window.KOLODA = [
   "id": "НАР-24",
   "mode": "наружу",
   "title": "Против света",
-  "text": "Найдите три предмета, которые сейчас читаются только силуэтом. Сместитесь на несколько шагов так, чтобы один из них перестал им быть.",
+  "text": "Найдите три предмета, которые сейчас видны только силуэтом. Сместитесь на несколько шагов так, чтобы один из них перестал им быть.",
   "back": "Силуэт возникает не из-за предмета, а из-за разницы яркостей за ним. Несколько шагов меняют её сильнее, чем время суток.",
   "level": 2,
   "age": null,
@@ -199,9 +213,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три предмета и одно смещение",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -225,9 +241,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "пять источников",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -251,9 +269,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два взгляда и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -264,7 +284,7 @@ window.KOLODA = [
   "id": "НАР-08",
   "mode": "наружу",
   "title": "До тридцати",
-  "text": "Найдите самое тёмное место в поле зрения и смотрите в него, считая до тридцати. Что проявилось к концу счёта? Ушли в мысль — вернитесь к счёту с того числа, где остановились.",
+  "text": "Найдите самое тёмное место в поле зрения и смотрите туда, считая до тридцати. Ушли в мысль — вернитесь к счёту с того же числа. Досчитали — готово.",
   "back": "Зрачок расширяется за секунды, а чувствительность сетчатки нарастает минутами. Первые полминуты дают самый заметный прирост.",
   "level": 3,
   "age": null,
@@ -277,9 +297,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "счёт до тридцати",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -303,9 +325,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "пять окон и два числа",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -316,7 +340,7 @@ window.KOLODA = [
   "id": "НАР-10",
   "mode": "наружу",
   "title": "Докуда достаёт",
-  "text": "Выберите один фонарь и определите шагами, докуда достаёт его свет. Сколько шагов до границы и сколько от неё до следующего фонаря?",
+  "text": "Выберите один фонарь и определите шагами, примерно докуда достаёт его свет. Сколько шагов до границы и сколько от неё до следующего фонаря?",
   "back": "Освещённость падает примерно как квадрат расстояния, поэтому граница света всегда ближе, чем кажется на глаз.",
   "level": 2,
   "age": null,
@@ -329,9 +353,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два числа",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -355,9 +381,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "один звук",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -367,8 +395,8 @@ window.KOLODA = [
  {
   "id": "НАР-12",
   "mode": "наружу",
-  "title": "Чего днём не было",
-  "text": "Найдите три отражения, которых днём в этом месте не бывает: тёмное окно, мокрый асфальт, стекло машины.",
+  "title": "Три отражения",
+  "text": "Найдите три отражения, и ни одно не должно быть в зеркале или в витрине.",
   "back": "Стекло становится зеркалом, когда снаружи темнее, чем внутри. Ночной город отражает сам себя там, где днём был прозрачен.",
   "level": 1,
   "age": null,
@@ -381,9 +409,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три отражения",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -394,7 +424,7 @@ window.KOLODA = [
   "id": "НАР-13",
   "mode": "наружу",
   "title": "Быстро и не очень",
-  "text": "Найдите что-нибудь красное. Теперь найдите что-нибудь красное и круглое. Засеките, что нашлось быстрее.",
+  "text": "Найдите что-нибудь красное. Теперь найдите что-нибудь красное и круглое. Что нашлось быстрее?",
   "back": "Поиск по одному признаку идёт параллельно по всему полю, поиск по сочетанию — последовательно, объект за объектом. Разница во времени и есть разница между двумя режимами внимания.",
   "level": 1,
   "age": null,
@@ -407,9 +437,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два объекта и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -433,9 +465,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два предмета и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -459,9 +493,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одна тень и один цвет",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -472,7 +508,7 @@ window.KOLODA = [
   "id": "НАР-16",
   "mode": "наружу",
   "title": "Три плана",
-  "text": "Найдите близкий, средний и дальний план. Расставьте их по дальности только по бледности, размер не учитывается.",
+  "text": "Найдите три предмета на разном удалении. Расставьте их по дальности, глядя только на то, какой бледнее.",
   "back": "В дымку и после дождя воздушная перспектива резко усиливается, в морозный ясный день почти исчезает и дальние здания кажутся ближе.",
   "level": 2,
   "age": null,
@@ -485,9 +521,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три плана в порядке",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -511,9 +549,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одна надпись и одно число",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -524,7 +564,7 @@ window.KOLODA = [
   "id": "НАР-18",
   "mode": "наружу",
   "title": "Одной температуры",
-  "text": "Найдите рядом металл и дерево. Они здесь одной температуры. Решите, что покажется холоднее, потом проверьте ладонью.",
+  "text": "Найдите рядом металл и дерево в тени. Решите, что покажется холоднее, потом проверьте ладонью.",
   "back": "Кожа измеряет не температуру предмета, а скорость, с которой он забирает тепло. Металл уносит быстрее, поэтому кажется холоднее при равной температуре.",
   "level": 2,
   "age": null,
@@ -537,9 +577,13 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [
+   "ясно"
+  ],
   "modality": "кросс",
   "criterion": "две поверхности, прогноз, проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -565,9 +609,11 @@ window.KOLODA = [
   "weather": [
    "после-дождя"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "одна найденная граница",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -577,8 +623,8 @@ window.KOLODA = [
  {
   "id": "НАР-20",
   "mode": "наружу",
-  "title": "Звучит не так, как выглядит",
-  "text": "Снимите наушники на две минуты. Найдите предмет, который звучит не так, как выглядит. После этого наушники можно вернуть.",
+  "title": "Тише, чем кажется",
+  "text": "Снимите наушники на две минуты. Найдите предмет, который выглядит громким, а звучит тихо или совсем не звучит. После этого наушники можно вернуть.",
   "back": "Сопоставление двух каналов нагружает внимание сильнее, чем поиск внутри одного, и почти не поддаётся автоматизации.",
   "level": 3,
   "age": null,
@@ -591,9 +637,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "кросс",
   "criterion": "один предмет",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -617,9 +665,11 @@ window.KOLODA = [
   "weather": [
    "ветер"
   ],
+  "weatherNot": [],
   "modality": "кросс",
   "criterion": "догадка и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -630,7 +680,7 @@ window.KOLODA = [
   "id": "НАР-35",
   "mode": "наружу",
   "title": "Двадцать секунд в тени",
-  "text": "Зайдите в тень арки, подъезда или под козырёк и смотрите вглубь, считая до двадцати. Что проявилось к концу счёта?",
+  "text": "Зайдите в тень арки, подъезда или под козырёк и смотрите вглубь, считая до двадцати. Досчитали — готово.",
   "back": "Зрачок расширяется за секунды, чувствительность сетчатки — минутами. Первые двадцать секунд дают самый заметный прирост, дальше медленнее.",
   "level": 3,
   "age": null,
@@ -644,9 +694,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "счёт до двадцати",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -671,9 +723,11 @@ window.KOLODA = [
    "снег",
    "наст"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три места и три догадки",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -698,9 +752,11 @@ window.KOLODA = [
    "свежий-снег",
    "наст"
   ],
+  "weatherNot": [],
   "modality": "кросс",
   "criterion": "десять шагов и названное число",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -724,9 +780,11 @@ window.KOLODA = [
   "weather": [
    "свежий-снег"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "две минуты и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -736,9 +794,9 @@ window.KOLODA = [
  {
   "id": "НАР-28",
   "mode": "наружу",
-  "title": "Светлее, чем должно быть",
-  "text": "Сейчас темно, но светлее, чем в бесснежную ночь. Найдите место, где это заметнее всего, и место, где разницы нет.",
-  "back": "Снег отражает почти весь падающий свет обратно вверх, низкие облака возвращают его вниз. В снежную пасмурную ночь город освещает сам себя.",
+  "title": "Где снег светится",
+  "text": "Найдите место, где снег светлее всего, и место, где он почти тёмный. Чем эти места отличаются?",
+  "back": "Сейчас светлее, чем в бесснежную ночь: снег отражает почти весь падающий свет обратно вверх, низкие облака возвращают его вниз. В снежную пасмурную ночь город освещает сам себя.",
   "level": 1,
   "age": null,
   "light": [
@@ -750,9 +808,11 @@ window.KOLODA = [
   "weather": [
    "снег"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два места",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -763,7 +823,7 @@ window.KOLODA = [
   "id": "НАР-29",
   "mode": "наружу",
   "title": "Город снова пахнет",
-  "text": "Идите, пока запах не сменится. Остановитесь на границе и вернитесь на два шага: держится?",
+  "text": "Найдите место, где пахнет сильнее всего. Отойдите на десять шагов: запах ещё есть?",
   "back": "На морозе пахучие молекулы почти не испаряются, и город обонятельно пуст. При переходе через ноль он включается за несколько часов — единственное зимнее окно для таких карт.",
   "level": 2,
   "age": null,
@@ -776,9 +836,11 @@ window.KOLODA = [
   "weather": [
    "оттепель"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "одна граница",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -802,9 +864,11 @@ window.KOLODA = [
   "weather": [
    "мороз"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два места и общий признак",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -814,8 +878,8 @@ window.KOLODA = [
  {
   "id": "НАР-31",
   "mode": "наружу",
-  "title": "Рельеф проявился",
-  "text": "Найдите, откуда и куда течёт талая вода. Дойдите взглядом до места, где она собирается.",
+  "title": "Куда течёт",
+  "text": "Найдите, откуда и куда течёт талая вода. Где она собирается?",
   "back": "Уклон двора незаметен и проявляется дважды в год: в ливень и в оттепель. Остальное время о нём можно догадываться только по тому, где раньше сохнет асфальт.",
   "level": 1,
   "age": null,
@@ -829,9 +893,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "направление и точка сбора",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -856,9 +922,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "температура",
   "criterion": "два места, счёт в каждом",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -882,9 +950,11 @@ window.KOLODA = [
   "weather": [
    "оттепель"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "две капели и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -895,7 +965,7 @@ window.KOLODA = [
   "id": "НАР-34",
   "mode": "наружу",
   "title": "Земля запахла",
-  "text": "Идите, пока не найдёте место, где земля пахнет сильнее всего. Отойдите на пять шагов: держится?",
+  "text": "Найдите место, где земля пахнет сильнее всего. Отойдите на пять шагов: держится?",
   "back": "Запах оттаявшей и мокрой земли даёт геосмин — вещество почвенных бактерий. Человек различает его в ничтожных концентрациях, чувствительнее, чем большинство запахов вообще.",
   "level": 2,
   "age": null,
@@ -909,9 +979,11 @@ window.KOLODA = [
    "после-дождя",
    "оттепель"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "место и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -922,7 +994,7 @@ window.KOLODA = [
   "id": "НАР-36",
   "mode": "наружу",
   "title": "Чего неделю назад не было",
-  "text": "Найдите то, чего в этом дворе не было неделю назад. Не уверены — найдите то, что появилось не сегодня, но и не осенью.",
+  "text": "Найдите то, чего в этом дворе не было неделю назад. Не уверены — засчитывается любая догадка.",
   "back": "Весной двор меняется быстрее, чем человек успевает привыкнуть. Это единственный сезон, когда возвращение в одно место даёт заметно новый результат.",
   "level": 1,
   "age": null,
@@ -935,9 +1007,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "один объект",
   "needsHistory": true,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -961,9 +1035,11 @@ window.KOLODA = [
   "weather": [
    "ясно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "пятна и одна версия",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -987,9 +1063,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "три звука",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1013,9 +1091,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "счёт до пяти",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1041,9 +1121,11 @@ window.KOLODA = [
    "ясно",
    "сухо"
   ],
+  "weatherNot": [],
   "modality": "температура",
   "criterion": "два места",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1068,9 +1150,11 @@ window.KOLODA = [
    "сухо",
    "после-дождя"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "два расстояния и два ответа",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1081,7 +1165,7 @@ window.KOLODA = [
   "id": "НАР-42",
   "mode": "наружу",
   "title": "Светло в неурочный час",
-  "text": "Сейчас позже, чем бывает светло. Найдите три вещи, которые обычно видите только при фонарях.",
+  "text": "Найдите три вещи, которые обычно видите только при фонарях.",
   "back": "В Петербурге 21 июня в девять вечера солнце ещё на 6,6° над горизонтом, в десять — на 1,2°, и только к одиннадцати начинаются сумерки. В Москве то же происходит примерно на час раньше.",
   "level": 1,
   "age": null,
@@ -1095,9 +1179,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три вещи",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1122,9 +1208,11 @@ window.KOLODA = [
   "weather": [
    "мороз"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два типа мест и общий признак",
   "needsHistory": true,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1148,9 +1236,11 @@ window.KOLODA = [
   "weather": [
    "дождь"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "три поверхности",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1175,9 +1265,11 @@ window.KOLODA = [
    "сухо",
    "после-дождя"
   ],
+  "weatherNot": [],
   "modality": "кросс",
   "criterion": "двадцать шагов, прогноз, проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1188,7 +1280,7 @@ window.KOLODA = [
   "id": "НАР-46",
   "mode": "наружу",
   "title": "Где прель сильнее",
-  "text": "Найдите место, где пахнет прелой листвой сильнее всего. Отойдите на пять шагов: держится?",
+  "text": "Найдите два места с разным запахом листвы. Сколько шагов между ними?",
   "back": "Запах дают почвенные бактерии и грибы, разлагающие опад. Он сильнее там, где листья лежат толстым влажным слоем и не выметаются: у стен, в углах дворов, под кустами.",
   "level": 2,
   "age": null,
@@ -1202,9 +1294,11 @@ window.KOLODA = [
    "после-дождя",
    "сухо"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "место и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1214,9 +1308,9 @@ window.KOLODA = [
  {
   "id": "НАР-47",
   "mode": "наружу",
-  "title": "Туман съел планы",
-  "text": "Насчитайте, сколько планов различимо в глубину. Через час их будет другое количество.",
-  "back": "В тумане рассеяние работает на дистанции в десятки метров вместо километров, и город раскладывается на планы, которых в ясный день нет. Единственная погода, когда воздушную перспективу видно во дворе.",
+  "title": "Сколько планов",
+  "text": "Насчитайте, сколько планов различимо в глубину: ближний, следующий, дальше.",
+  "back": "Через час их будет другое количество. В тумане рассеяние работает на дистанции в десятки метров вместо километров, и город раскладывается на планы, которых в ясный день нет.",
   "level": 1,
   "age": null,
   "light": [
@@ -1229,9 +1323,11 @@ window.KOLODA = [
   "weather": [
    "туман"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одно число",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1241,8 +1337,8 @@ window.KOLODA = [
  {
   "id": "НАР-48",
   "mode": "наружу",
-  "title": "Неделю назад было светлее",
-  "text": "Вспомните, было ли светло в это же время на прошлой неделе. Найдите то, что сейчас уже приходится угадывать.",
+  "title": "Что уже не разглядеть",
+  "text": "Найдите то, что сейчас приходится угадывать, а не видеть: цвет двери, номер дома, лицо на вывеске.",
   "back": "Осенью день сокращается примерно на 5,4 минуты в сутки в Петербурге и на 4,4 в Москве — больше получаса за неделю. Единственное время года, когда изменение освещённости заметно на масштабе памяти.",
   "level": 1,
   "age": null,
@@ -1256,9 +1352,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "один объект",
   "needsHistory": true,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -1269,7 +1367,7 @@ window.KOLODA = [
   "id": "ЧМ-01",
   "mode": "читать-место",
   "title": "Два возраста на одной стене",
-  "text": "Найдите на одной стене два участка кладки разного возраста. Назовите признак, по которому вы их различили.",
+  "text": "Найдите на одной стене два участка кладки разного возраста. По чему вы поняли, что они разного возраста?",
   "back": "Признаков обычно три: цвет и зернистость раствора, размер кирпича, перевязка. Позднейшая вставка почти всегда даёт сплошной вертикальный шов — старая и новая кладка не переплетены.",
   "level": 2,
   "age": null,
@@ -1283,9 +1381,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два участка и один признак",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "починка",
@@ -1310,9 +1410,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два проёма",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "починка",
@@ -1337,9 +1439,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "стена и предсказанное число",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "починка",
@@ -1363,9 +1467,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три наблюдения и предсказание",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "природа",
@@ -1376,7 +1482,7 @@ window.KOLODA = [
   "id": "ЧМ-05",
   "mode": "читать-место",
   "title": "Дерево с лишайником и без",
-  "text": "Найдите ствол с лишайником и ствол без него. Что находится рядом со вторым, чего нет у первого?",
+  "text": "Найдите ствол с лишайником и ствол без него. Что есть рядом со вторым и чего нет у первого?",
   "back": "Лишайники чувствительны к загрязнению воздуха, прежде всего к соединениям серы, и вдоль оживлённых магистралей исчезают. Кустистые формы уходят первыми, накипные держатся дольше всех.",
   "level": 2,
   "age": null,
@@ -1389,9 +1495,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два дерева и один фактор",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "природа",
@@ -1417,9 +1525,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три растения и одна пустая трещина",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "природа",
@@ -1444,9 +1554,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два слоя в порядке",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "графика",
@@ -1471,9 +1583,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одно пятно",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "графика",
@@ -1484,7 +1598,7 @@ window.KOLODA = [
   "id": "ЧМ-09",
   "mode": "читать-место",
   "title": "Где автору хватило времени",
-  "text": "Найдите место, где никто не ходит и можно стоять долго. Предскажите, есть ли там рисунок сложнее, чем на виду. Проверьте.",
+  "text": "Найдите проходное место с рисунком и место в стороне от потока — арку, торец, двор. Где рисунок сложнее?",
   "back": "Сложность работы зависит от времени, которое было у автора. Быстрые теги появляются там, где видно; проработанные вещи — в тупиках и на задворках. Признак переносится на любой район.",
   "level": 3,
   "age": null,
@@ -1497,9 +1611,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "место, предсказание, проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "графика",
@@ -1524,9 +1640,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два люка и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "инфраструктура",
@@ -1551,9 +1669,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "крепление и направление",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "инфраструктура",
@@ -1577,9 +1697,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два фонаря, ответ, предсказание",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "инфраструктура",
@@ -1604,9 +1726,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "спб",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1631,9 +1755,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "спб",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1658,9 +1784,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "спб",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1671,7 +1799,7 @@ window.KOLODA = [
   "id": "СПб-04",
   "mode": "читать-место",
   "title": "Гранит и его починка",
-  "text": "Найдите гранитный цоколь и место, где его чинили. Чем чинили и почему видно?",
+  "text": "Найдите гранитный цоколь и место, где его чинили. Чем заделали и по чему это видно?",
   "back": "Цоколи чаще всего из местного гранита-рапакиви с крупными округлыми вкраплениями полевого шпата. Заделка бетоном или новым камнем видна сразу: другой размер зерна, другая фактура скола, ровный край вместо тёсаного.",
   "level": 2,
   "age": null,
@@ -1685,9 +1813,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "спб",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1711,9 +1841,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "спб",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1738,9 +1870,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "спб",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1764,9 +1898,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "спб",
   "buildingType": "массовая",
   "layer": null,
@@ -1790,9 +1926,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "мск",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1817,9 +1955,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "мск",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1843,9 +1983,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "мск",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1870,9 +2012,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "мск",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1896,9 +2040,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "мск",
   "buildingType": null,
   "layer": null,
@@ -1922,9 +2068,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "мск",
   "buildingType": "исторический-центр",
   "layer": null,
@@ -1948,9 +2096,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": "мск",
   "buildingType": "массовая",
   "layer": null,
@@ -1975,9 +2125,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три предмета",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2001,9 +2153,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одно лицо",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2014,7 +2168,7 @@ window.KOLODA = [
   "id": "СВ-03",
   "mode": "совместное-внимание",
   "title": "Один и много",
-  "text": "Покажите место, где чего-то одно, и место, где много. Пусть ребёнок найдёт третье.",
+  "text": "Найдите предмет, которого здесь только один, и скажите вслух: «один». Потом найдите такие, которых много: «много». Пусть ребёнок покажет что-нибудь ещё — одно или много, всё равно.",
   "back": "Оппозиция «один — много» появляется раньше счёта и раньше числительных. На ней строится всё дальнейшее, поэтому в два года это и есть математика.",
   "level": null,
   "age": "2-3",
@@ -2028,14 +2182,16 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три места",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
   "entryType": null,
-  "fallback": "возьмите два камешка и горсть — противопоставление в руках понятнее."
+  "fallback": "Подойдёт что угодно: одна скамейка, одна дверь — много окон, много листьев."
  },
  {
   "id": "СВ-04",
@@ -2054,9 +2210,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три вещи",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2082,9 +2240,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три поверхности",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2109,9 +2269,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два окна",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2136,9 +2298,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два листа",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2149,7 +2313,7 @@ window.KOLODA = [
   "id": "СВ-08",
   "mode": "совместное-внимание",
   "title": "Сколько видно сразу",
-  "text": "Покажите группу предметов и спросите, сколько их — не считая. Потом пересчитайте вместе и посмотрите, совпало ли.",
+  "text": "Найдите несколько одинаковых предметов рядом: окна, машины, камешки, ступени. Спросите ребёнка, сколько их — не считая. Потом пересчитайте вместе.",
   "back": "До трёх-четырёх ребёнок отвечает мгновенно, дальше начинает пересчитывать — граница видна прямо в разговоре. Это не тест: интересно обоим.",
   "level": null,
   "age": "4-5",
@@ -2163,9 +2327,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "оценка и пересчёт",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2189,9 +2355,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два числа",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2216,9 +2384,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три предмета",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2242,9 +2412,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два места",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2269,9 +2441,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три вещи",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2296,9 +2470,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "по предмету у каждого",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2323,9 +2499,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "две вещи и обмен местами",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2350,9 +2528,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "прогноз и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2376,9 +2556,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два разных звука",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2403,9 +2585,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три отличия",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2430,9 +2614,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "число и оценка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2456,9 +2642,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одно объяснённое задание",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2483,9 +2671,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "объект и объяснение",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2510,9 +2700,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три наблюдения, предсказание, проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2536,9 +2728,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "две оценки, проверка, объяснение",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2562,9 +2756,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "описание и недостающий признак",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2589,9 +2785,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "место и версия",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2602,7 +2800,7 @@ window.KOLODA = [
   "id": "СБ-01",
   "mode": "с-собакой",
   "title": "Пока она читает",
-  "text": "Пока она обнюхивает одно место — идите вдоль поводка, пока не сменится ваш запах. Найдите границу и вернитесь на два шага: держится?",
+  "text": "Пока она обнюхивает одно место — отойдите на длину поводка. Запах тот же или сменился?",
   "back": "Запахи почти не называются словами, зато уверенно локализуются. Задание про границу выполнимо, «назовите запах» — нет.",
   "level": null,
   "age": null,
@@ -2617,9 +2815,11 @@ window.KOLODA = [
    "после-дождя",
    "оттепель"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "одна граница",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2643,9 +2843,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "один признак",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2669,9 +2871,11 @@ window.KOLODA = [
   "weather": [
    "ветер"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "два подхода и ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2697,9 +2901,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "точка, проверенная дважды",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2723,9 +2929,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "прогноз и подсчёт",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2749,9 +2957,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одна точка любого типа",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2775,9 +2985,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "кросс",
   "criterion": "источник или истечение тридцати секунд",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2802,9 +3014,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "один объект",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2831,9 +3045,11 @@ window.KOLODA = [
    "сухо",
    "мороз"
   ],
+  "weatherNot": [],
   "modality": "температура",
   "criterion": "место и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2857,9 +3073,11 @@ window.KOLODA = [
   "weather": [
    "после-дождя"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "три запаха",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2870,7 +3088,7 @@ window.KOLODA = [
   "id": "СБ-11",
   "mode": "с-собакой",
   "title": "Ей есть что читать",
-  "text": "Сегодня город для вас не пахнет. Посмотрите, изменилось ли от этого её поведение на остановках.",
+  "text": "Попробуйте почувствовать хоть один запах. Потом посмотрите, изменилось ли от мороза её поведение на остановках.",
   "back": "На морозе летучесть падает, и человек перестаёт чувствовать почти всё. У собаки порог несопоставимо ниже, поэтому её обонятельный мир сжимается гораздо меньше. Самый наглядный день в году, чтобы увидеть разницу.",
   "level": null,
   "age": null,
@@ -2883,9 +3101,11 @@ window.KOLODA = [
   "weather": [
    "мороз"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "одно наблюдение",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2911,9 +3131,11 @@ window.KOLODA = [
   "weather": [
    "свежий-снег"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "место и версия",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2937,9 +3159,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2963,9 +3187,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -2989,9 +3215,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3016,9 +3244,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3042,9 +3272,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3068,9 +3300,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3095,9 +3329,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3105,11 +3341,11 @@ window.KOLODA = [
   "fallback": null
  },
  {
-  "id": "ПД-08",
+  "id": "ПД-08а",
   "mode": "полевой-дневник",
-  "title": "Что изменилось",
-  "text": "Если вы здесь уже были — одна фраза о том, что изменилось. Если нет — одна фраза о том, что изменится первым.",
-  "back": "Карта работает в обе стороны и не требует памяти о месте: новичок пишет прогноз, постоянный — наблюдение.",
+  "title": "Что изменится первым",
+  "text": "Одна фраза о том, что здесь изменится первым.",
+  "back": "Прогноз не требует памяти о месте: достаточно увидеть, что здесь держится непрочно. Первым в голову обычно приходит то, что уже начало меняться, — и это и есть ответ.",
   "level": null,
   "age": null,
   "light": [
@@ -3121,9 +3357,39 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": true,
+  "cityPack": null,
+  "buildingType": null,
+  "layer": null,
+  "entryType": "свободная",
+  "fallback": null
+ },
+ {
+  "id": "ПД-08б",
+  "mode": "полевой-дневник",
+  "title": "Что изменилось",
+  "text": "Одна фраза о том, что здесь изменилось с прошлого раза.",
+  "back": "Изменения замечают хуже, чем предметы: образ места обновляется незаметно для самого человека. Названное словами перестаёт быть фоном.",
+  "level": null,
+  "age": null,
+  "light": [
+   "неважно"
+  ],
+  "seasons": [
+   "любой"
+  ],
+  "weather": [
+   "неважно"
+  ],
+  "weatherNot": [],
+  "modality": null,
+  "criterion": null,
+  "needsHistory": true,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3148,9 +3414,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3174,9 +3442,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3202,9 +3472,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3228,9 +3500,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": true,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3254,9 +3528,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "две тени и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3280,9 +3556,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три названных предмета и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3306,9 +3584,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два предмета и пять переводов",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3332,9 +3612,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "кросс",
   "criterion": "две половины и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3358,9 +3640,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "одно направление и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3384,9 +3668,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два места и счёт",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3410,9 +3696,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три неподвижных",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3436,9 +3724,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "кросс",
   "criterion": "две машины и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3462,9 +3752,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два числа",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3488,9 +3780,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одна вещь",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3514,9 +3808,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "один звук и счёт до двадцати",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3540,9 +3836,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "предсказанное место и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3569,9 +3867,11 @@ window.KOLODA = [
    "мороз",
    "оттепель"
   ],
+  "weatherNot": [],
   "modality": "температура",
   "criterion": "две стены и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3595,9 +3895,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одна граница, проверенная с двух сторон",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3621,9 +3923,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "два фонаря и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3647,9 +3951,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "три окна и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3673,9 +3979,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "три звука",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3699,9 +4007,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "два места и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3725,9 +4035,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "один звук и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3751,9 +4063,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "два места",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -3778,9 +4092,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "один ряд окон и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "инфраструктура",
@@ -3804,9 +4120,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два фонаря и одна граница",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "инфраструктура",
@@ -3831,9 +4149,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одно здание и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "графика",
@@ -3857,9 +4177,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одна стена и один след",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "починка",
@@ -3884,9 +4206,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одна вывеска и один след",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "графика",
@@ -3910,9 +4234,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два места и один признак",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "инфраструктура",
@@ -3936,9 +4262,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два дерева и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "природа",
@@ -3963,9 +4291,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одна витрина и две точки",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "графика",
@@ -3990,9 +4320,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "две таблички и один признак",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "графика",
@@ -4017,9 +4349,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одна опора и число направлений",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": "инфраструктура",
@@ -4044,9 +4378,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три окна",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4071,9 +4407,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два огня",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4097,9 +4435,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одна тень и два шага",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4124,9 +4464,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три вещи",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4150,9 +4492,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три вещи",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4177,9 +4521,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "две тени",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4204,9 +4550,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два окна и одно исключение",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4231,9 +4579,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три звука",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4258,9 +4608,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два окна и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4284,9 +4636,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одно пятно и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4310,9 +4664,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два числа и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4336,9 +4692,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одно место и предсказание",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4362,9 +4720,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "две тени и один ответ",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4389,9 +4749,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "три и три",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4415,9 +4777,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два огня и десять шагов",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4441,9 +4805,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "одна граница и два места",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4467,9 +4833,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "один источник",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4494,9 +4862,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "два предсказания",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4521,9 +4891,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "две группы и одна граница",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4547,9 +4919,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": "один огонь и одно объяснение",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4573,9 +4947,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "один отрезок и счёт шагов",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4599,9 +4975,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "зрение",
   "criterion": "одна точка и один признак",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4625,9 +5003,11 @@ window.KOLODA = [
   "weather": [
    "ветер"
   ],
+  "weatherNot": [],
   "modality": "обоняние",
   "criterion": "одна граница и проверка",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4651,9 +5031,11 @@ window.KOLODA = [
   "weather": [
    "сухо"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": "один звук и счёт до тридцати",
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4678,9 +5060,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4704,9 +5088,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4730,9 +5116,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": null,
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,
@@ -4757,9 +5145,11 @@ window.KOLODA = [
   "weather": [
    "неважно"
   ],
+  "weatherNot": [],
   "modality": "слух",
   "criterion": null,
   "needsHistory": false,
+  "noHistory": false,
   "cityPack": null,
   "buildingType": null,
   "layer": null,

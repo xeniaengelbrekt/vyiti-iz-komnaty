@@ -34,9 +34,12 @@ AGE_BY_SECTION = [
 ]
 # карты, которым нужна память о месте (часть VIII свода) + ПД-12: она
 # прямо требует более ранней записи о том же месте
-NEEDS_HISTORY = {"НАР-36", "НАР-43", "НАР-48", "ПД-12"}
+NEEDS_HISTORY = {"НАР-36", "НАР-43", "НАР-48", "ПД-12", "ПД-08б"}
+# обратное условие: карточка только для тех, кто здесь ещё не был
+NO_HISTORY = {"ПД-08а"}
 
-CARD_RE = re.compile(r"^\*\*([A-Za-zА-Яа-яЁё]+-\d+)\s*·\s*(.+?)\*\*(.*)$")
+# у разделённых карточек к номеру добавлена буква: ПД-08а, ПД-08б
+CARD_RE = re.compile(r"^\*\*([A-Za-zА-Яа-яЁё]+-\d+[А-Яа-яA-Za-z]?)\s*·\s*(.+?)\*\*(.*)$")
 HEAD_RE = re.compile(r"^#{1,6}\s")
 TOKEN_RE = re.compile(r"`([^`]+)`")
 
@@ -77,9 +80,11 @@ for b in blocks:
         "light": [],
         "seasons": ["любой"],
         "weather": ["неважно"],
+        "weatherNot": [],
         "modality": None,
         "criterion": None,
         "needsHistory": b["id"] in NEEDS_HISTORY,
+        "noHistory": b["id"] in NO_HISTORY,
         "cityPack": CITY_BY_PREFIX.get(prefix),
         "buildingType": None,
         "layer": None,
@@ -95,7 +100,7 @@ for b in blocks:
     m = re.search(r"\*Оборот\.\*\s*(.+)", raw)
     if m:
         card["back"] = m.group(1).strip()
-    m = re.search(r"\*Если не пошло:\*\s*(.+)", raw)
+    m = re.search(r"\*Если не получается:\*\s*(.+)", raw)
     if m:
         card["fallback"] = m.group(1).strip()
 
@@ -124,6 +129,8 @@ for b in blocks:
                 card["seasons"] = split_list(value)
             elif key == "погода":
                 card["weather"] = split_list(value)
+            elif key == "погода кроме":
+                card["weatherNot"] = split_list(value)
             elif key == "слой":
                 card["layer"] = value
             elif key == "застройка":

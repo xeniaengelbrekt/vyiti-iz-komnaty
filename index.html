@@ -115,10 +115,10 @@
     <footer class="footer">
       <p>Это инструмент самопомощи, а не лечение и не замена терапии. При паническом расстройстве,
         ПТСР и выраженной агорафобии пользоваться им стоит вместе со специалистом.</p>
-      <p class="links">
+      <nav class="links" aria-label="Разделы">
         <button type="button" class="link" data-go="archive">Дневник</button>
         <button type="button" class="link" data-go="about">О проекте</button>
-      </p>
+      </nav>
     </footer>
   </div>
 </section>
@@ -129,7 +129,7 @@
     <div class="card-body">
       <p class="card-text" id="card-text" tabindex="-1"></p>
       <details class="hint" id="card-hint" hidden>
-        <summary>Если не пошло</summary>
+        <summary>Если не получается</summary>
         <p id="card-hint-text"></p>
       </details>
     </div>
@@ -155,27 +155,21 @@
   </div>
 </section>
 
-<!-- 4. Оборот -->
+<!-- 4. Оборот: он же конец. Задание, объяснение, «на сегодня всё» и навигация -->
 <section class="screen" id="screen-back" data-screen="back" aria-labelledby="back-title" hidden>
-  <div class="wrap">
-    <h2 id="back-title" tabindex="-1"></h2>
-    <p class="back-text" id="back-text"></p>
-    <div class="bottom">
-      <button type="button" class="btn btn-main" id="btn-back-next">Дальше</button>
+  <div class="wrap wrap-back">
+    <div class="back-body">
+      <p class="done-task" id="done-task"></p>
+      <h2 id="back-title" tabindex="-1"></h2>
+      <p class="back-text" id="back-text"></p>
+      <p class="closing">На сегодня всё.</p>
+      <nav class="links" aria-label="Разделы">
+        <button type="button" class="link" id="btn-more">Ещё одну</button>
+        <button type="button" class="link" data-go="archive">Дневник</button>
+        <button type="button" class="link" data-go="about">О проекте</button>
+        <button type="button" class="link" data-go="start">Сменить режим</button>
+      </nav>
     </div>
-  </div>
-</section>
-
-<!-- 5. Конец -->
-<section class="screen" id="screen-end" data-screen="end" aria-labelledby="end-title" hidden>
-  <div class="wrap">
-    <h2 id="end-title" tabindex="-1">На сегодня всё.</h2>
-    <p class="links links-end">
-      <button type="button" class="link" id="btn-more">Ещё одну</button>
-      <button type="button" class="link" data-go="start">Режим</button>
-      <button type="button" class="link" data-go="archive">Дневник</button>
-      <button type="button" class="link" data-go="about">О проекте</button>
-    </p>
   </div>
 </section>
 

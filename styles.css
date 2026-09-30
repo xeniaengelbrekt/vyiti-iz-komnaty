@@ -267,6 +267,7 @@ main { display: block; }
   padding: 0;
   margin: 0;
   font: inherit;
+  font-size: 15px;            /* служебное: меньше задания, размером с подпись */
   color: var(--muted);
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -276,8 +277,7 @@ main { display: block; }
 }
 .link:active { color: var(--text); }
 
-.links { display: flex; flex-wrap: wrap; gap: 6px 24px; margin: 4px 0 0; }
-.links-end { margin-top: 18px; }
+.links { display: flex; flex-wrap: wrap; gap: 2px 24px; margin: 4px 0 0; }
 
 :focus-visible {
   outline: 2px solid var(--accent-ink);
@@ -365,12 +365,37 @@ input[type="text"]:focus, textarea:focus { border-color: var(--accent-ink); }
 .hint summary::-webkit-details-marker { display: none; }
 .hint p { margin: 0 0 4px; }
 
-/* ——— оборот и запись ——— */
+/* ——— оборот: он же конец ——— */
+
+/* Содержимое стоит по середине экрана, а не жмётся к верхнему краю. */
+.wrap-back {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.back-body {
+  margin: auto 0;             /* центрирует, но ничего не срезает, если не влезло */
+  width: 100%;
+}
+
+/* Задание, которое только что выполнено: мелко и приглушённо —
+   за десять минут ходьбы формулировка успевает забыться. */
+.done-task {
+  font-size: clamp(17px, 4.5vw, 20px);   /* примерно в полтора раза меньше задания */
+  line-height: 1.4;
+  color: var(--muted);
+  max-width: 34ch;
+  margin-bottom: 22px;
+}
 
 .back-text {
   font-size: clamp(18px, 4.8vw, 20px);
   line-height: 1.5;
   max-width: 36ch;
+}
+
+.closing {
+  margin: 26px 0 0;
+  color: var(--muted);
 }
 
 .note-task {

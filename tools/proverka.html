@@ -86,17 +86,17 @@ if ('serviceWorker' in navigator) {
 
   /* ——— колода ——— */
   section('Колода');
-  check('всего карт', K.length, 180);
+  check('всего карт', K.length, 181);
   check('наружу', count(function (c) { return c.mode === 'наружу'; }), 68);
   check('читать место', count(function (c) { return c.mode === 'читать-место'; }), 36);
   check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 44);
   check('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 16);
-  check('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 16);
+  check('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 17);
   check('набор Петербурга', count(function (c) { return c.cityPack === 'спб'; }), 7);
   check('набор Москвы', count(function (c) { return c.cityPack === 'мск'; }), 7);
-  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 180);
+  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 181);
   check('у каждой карты есть текст и оборот',
-        count(function (c) { return c.text && c.back; }), 180);
+        count(function (c) { return c.text && c.back; }), 181);
   check('у всех «наружу» есть уровень',
         count(function (c) { return c.mode === 'наружу' && c.level; }), 68);
   check('у всех «совместное внимание» есть возраст',
@@ -233,6 +233,38 @@ if ('serviceWorker' in navigator) {
   pool.forEach(function (c, i) { seenAll[c.id] = i === 1 ? '2026-10-20' : '2026-11-14'; });
   check('когда все показаны — берётся самая давняя, а не пустота',
         Deck.pick(K, ctx({ level: 2, seen: seenAll })).id, pool[1].id);
+
+  /* правило: не больше одной звуковой карточки из трёх подряд */
+  var soundIds = K.filter(function (c) { return Deck.isSound(c); });
+  check('звуковые карточки опознаются', soundIds.length > 10, true);
+  var afterTwo = [], afterOne = [];
+  for (var t = 0; t < 200; t++) {
+    afterTwo.push(Deck.pick(K, ctx({ level: 2, light: 'неважно', recent: [true, false, true] })));
+    afterOne.push(Deck.pick(K, ctx({ level: 2, light: 'неважно', recent: [false, false, true] })));
+  }
+  check('после двух звуковых из трёх звуковых не выдаём',
+        afterTwo.some(function (c) { return c && Deck.isSound(c); }), false);
+  check('после одной звуковой они по-прежнему доступны',
+        afterOne.some(function (c) { return c && Deck.isSound(c); }), true);
+
+  /* запрет по погоде сильнее разрешения */
+  var nar18 = function (c) { return c.id === 'НАР-18'; };
+  check('НАР-18 не выдаётся в ясную погоду',
+        Deck.pool(K, ctx({ level: 2, light: 'неважно', weather: ['ясно', 'сухо'] })).some(nar18), false);
+  check('НАР-18 выдаётся в облачную',
+        Deck.pool(K, ctx({ level: 2, light: 'неважно', weather: ['облачно', 'сухо'] })).some(nar18), true);
+
+  /* ПД-08 разделена по числу сессий */
+  function diaryIds(sessions) {
+    var out = {};
+    for (var n = 0; n < 300; n++) {
+      var c = Deck.pick(K, ctx({ mode: 'полевой-дневник', light: 'неважно', sessions: sessions }));
+      if (c && c.id.indexOf('ПД-08') === 0) out[c.id] = true;
+    }
+    return Object.keys(out).sort();
+  }
+  check('новичку — «что изменится первым»', diaryIds(0), ['ПД-08а']);
+  check('после трёх сессий — «что изменилось»', diaryIds(5), ['ПД-08б']);
 
   check('пустой пул возвращает null, а не ошибку',
         Deck.pick(K, ctx({ mode: 'совместное-внимание', age: 'нет такого' })), null);

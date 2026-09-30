@@ -60,6 +60,11 @@
 
   function weatherFits(card, tags, relaxed) {
     if (!tags) return true;                        // погода не загрузилась
+    /* Запрет сильнее разрешения: «одной температуры» неверна на солнце,
+       сколько бы других тегов ни совпало. */
+    for (var n = 0; n < (card.weatherNot || []).length; n++) {
+      if (has(tags, card.weatherNot[n])) return false;
+    }
     if (has(card.weather, 'неважно')) return true;
     var need = card.weather;
     if (relaxed) {
@@ -68,6 +73,21 @@
     }
     for (var i = 0; i < need.length; i++) if (has(tags, need[i])) return true;
     return false;
+  }
+
+  /* Звуковой считается не только карта с модальностью «слух»: те же слова
+     про наушники стоят и у кроссмодальных, а бросается в глаза именно зачин. */
+  function isSound(card) {
+    return card.modality === 'слух' ||
+           (card.text || '').indexOf('Снимите наушники') === 0;
+  }
+
+  function soundStreak(recent) {
+    if (!recent || recent.length < 2) return false;
+    var last = recent.slice(-3);
+    var n = 0;
+    for (var i = 0; i < last.length; i++) if (last[i]) n++;
+    return n >= 2;
   }
 
   function modeFits(card, o) {
@@ -100,6 +120,16 @@
 
     if ((o.sessions || 0) < HISTORY_SESSIONS) {
       list = list.filter(function (c) { return !c.needsHistory; });
+    } else {
+      list = list.filter(function (c) { return !c.noHistory; });
+    }
+
+    /* Шесть карточек начинаются со «Снимите наушники на две минуты».
+       Формула верная, но три подряд создают впечатление крошечной колоды:
+       если две из трёх последних были звуковыми, эту выдачу пропускаем мимо них. */
+    if (soundStreak(o.recent)) {
+      var quiet = list.filter(function (c) { return !isSound(c); });
+      if (quiet.length) list = quiet;
     }
 
     var fresh = list.filter(function (c) {
@@ -133,6 +163,7 @@
   global.Deck = {
     pick: pick,
     pool: pool,
+    isSound: isSound,
     cityOf: cityOf,
     inOldCenter: inOldCenter,
     distanceKm: distanceKm,
