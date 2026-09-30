@@ -132,6 +132,19 @@
         <summary>Если не получается</summary>
         <p id="card-hint-text"></p>
       </details>
+      <details class="why" id="card-why">
+        <summary>Зачем это</summary>
+        <div class="why-body">
+          <div class="why-block" id="why-done">
+            <h3 class="why-label">Что считается выполненным</h3>
+            <p id="why-criterion"></p>
+          </div>
+          <div class="why-block">
+            <h3 class="why-label">Зачем такие задания</h3>
+            <p id="why-mode"></p>
+          </div>
+        </div>
+      </details>
     </div>
     <div class="bottom bottom-card">
       <button type="button" class="btn btn-main" id="btn-done">Готово</button>
@@ -198,6 +211,11 @@
         в браузере. Погода берётся с open-meteo.com по округлённым координатам; если она не
         загрузилась, отбор идёт по свету и сезону.</p>
     </div>
+
+    <h3 class="section-title">Психологическая валидация проекта</h3>
+    <p class="about-text credit">Диана Наумова<br>
+      <span class="muted">Психолог в КПТ-подходе, студентка магистратуры НИУ ВШЭ
+      «Консультативная психология»</span></p>
 
     <h3 class="section-title" id="theme-label">Тема</h3>
     <div class="options options-row" role="group" aria-labelledby="theme-label" id="theme-list">

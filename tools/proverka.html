@@ -86,17 +86,17 @@ if ('serviceWorker' in navigator) {
 
   /* ——— колода ——— */
   section('Колода');
-  check('всего карт', K.length, 181);
+  check('всего карт', K.length, 189);
   check('наружу', count(function (c) { return c.mode === 'наружу'; }), 68);
-  check('читать место', count(function (c) { return c.mode === 'читать-место'; }), 36);
+  check('читать место', count(function (c) { return c.mode === 'читать-место'; }), 40);
   check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 44);
-  check('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 16);
+  check('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 20);
   check('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 17);
   check('набор Петербурга', count(function (c) { return c.cityPack === 'спб'; }), 7);
   check('набор Москвы', count(function (c) { return c.cityPack === 'мск'; }), 7);
-  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 181);
+  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 189);
   check('у каждой карты есть текст и оборот',
-        count(function (c) { return c.text && c.back; }), 181);
+        count(function (c) { return c.text && c.back; }), 189);
   check('у всех «наружу» есть уровень',
         count(function (c) { return c.mode === 'наружу' && c.level; }), 68);
   check('у всех «совместное внимание» есть возраст',
@@ -334,6 +334,26 @@ if ('serviceWorker' in navigator) {
     var outside = scripts.filter(function (s) { return /https?:/.test(s); });
     check('сторонние скрипты', outside, []);
     check('внешние шрифты', /fonts\.googleapis|@import/.test(src), false);
+    var whyBlock = (src.match(/<details class="why"[\s\S]*?<\/details>/) || [''])[0];
+    check('«Зачем это» есть на экране карточки', whyBlock.length > 0, true);
+    check('«Зачем это» не раскрывает оборот', /back-text|card\.back/.test(whyBlock), false);
+    endSection();
+    section('Тексты «зачем такие задания»');
+    fetch('../js/app.js').then(function (r) { return r.text(); }).then(function (js) {
+      var body = (js.match(/var WHY = \{[\s\S]*?\};/) || [''])[0];
+      ['наружу', 'читать-место', 'совместное-внимание', 'с-собакой', 'полевой-дневник']
+        .forEach(function (mode) {
+          check('есть текст для режима «' + mode + '»', body.indexOf("'" + mode + "'") >= 0, true);
+        });
+      check('оборот в эти тексты не попадает', /\.back/.test(body), false);
+      endSection();
+      layout();
+    }).catch(function () {
+      html.push('<tr><td>app.js не прочитать</td><td class="note">проверка пропущена</td></tr>');
+      endSection();
+      layout();
+    });
+    return;
     endSection();
     layout();
   }).catch(function () {
