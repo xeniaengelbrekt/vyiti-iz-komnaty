@@ -334,6 +334,24 @@ if ('serviceWorker' in navigator) {
     var outside = scripts.filter(function (s) { return /https?:/.test(s); });
     check('сторонние скрипты', outside, []);
     check('внешние шрифты', /fonts\.googleapis|@import/.test(src), false);
+    /* тексты главного экрана и раздел «Об авторах» */
+    check('подзаголовок главного экрана',
+          src.indexOf('Одна карточка на прогулку. Маршрут тот же.') >= 0, true);
+    check('третья строка главного экрана',
+          src.indexOf('Никуда ехать не надо') >= 0, true);
+    check('у каждого режима есть строка ниже',
+          (src.match(/option-sub/g) || []).length, 5);
+    check('фразы про наушники нет среди подписей режимов',
+          /option-note">\s*если трудно выйти/.test(src), false);
+    check('ступень «со взрослым» есть в разметке',
+          src.indexOf('data-age="со-взрослым"') >= 0, true);
+    ['Об авторах', 'На чём это основано', 'Чего мы не утверждаем'].forEach(function (h) {
+      check('раздел «' + h + '»', src.indexOf('>' + h + '<') >= 0, true);
+    });
+    check('авторов двое', (src.match(/person-name/g) || []).length, 2);
+    check('ссылки открываются в новой вкладке',
+          (src.match(/rel="noopener noreferrer"/g) || []).length, 2);
+
     var whyBlock = (src.match(/<details class="why"[\s\S]*?<\/details>/) || [''])[0];
     check('«Зачем это» есть на экране карточки', whyBlock.length > 0, true);
     check('«Зачем это» не раскрывает оборот', /back-text|card\.back/.test(whyBlock), false);
@@ -346,6 +364,8 @@ if ('serviceWorker' in navigator) {
           check('есть текст для режима «' + mode + '»', body.indexOf("'" + mode + "'") >= 0, true);
         });
       check('оборот в эти тексты не попадает', /\.back/.test(body), false);
+      check('текст «Совместного внимания» не про ребёнка',
+            body.indexOf('друг друга') >= 0, true);
       endSection();
       layout();
     }).catch(function () {

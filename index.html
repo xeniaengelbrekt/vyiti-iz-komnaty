@@ -26,36 +26,42 @@
   <div class="wrap">
     <h1 id="start-title" tabindex="-1">Выйти из комнаты</h1>
 
-    <p class="lead">Одна карточка — одно задание на шестьдесят-девяносто секунд рядом с домом.
-      Ответ всегда снаружи: найти три предмета, дойти до пяти, простоять до десяти.</p>
-    <p class="lead muted">Никуда идти не надо. Маршрут тот же.</p>
+    <p class="lead">Одна карточка на прогулку. Маршрут тот же.</p>
+    <p class="lead muted">Никуда ехать не надо. Всё, что нужно, есть во дворе, где вы ходите
+      каждый день, — просто вы на это не смотрели.</p>
 
     <h2 class="section-title" id="mode-title">Режим</h2>
     <div class="options" role="group" aria-labelledby="mode-title" id="mode-list">
       <button type="button" class="option" data-mode="наружу">
         <span class="option-name">Наружу</span>
-        <span class="option-note">если трудно выйти и вы гуляете в наушниках</span>
+        <span class="option-note">заметить то, что обычно не замечаете</span>
+        <span class="option-sub">одно задание на прогулку, полторы минуты, рядом с домом</span>
       </button>
       <button type="button" class="option" data-mode="читать-место">
         <span class="option-name">Читать место</span>
-        <span class="option-note">если хочется понимать, на что вы смотрите</span>
+        <span class="option-note">понять, на что вы смотрите каждый день</span>
+        <span class="option-sub">почему мох растёт с этой стороны и что было на месте закраски</span>
       </button>
       <button type="button" class="option" data-mode="совместное-внимание">
         <span class="option-name">Совместное внимание</span>
-        <span class="option-note">если вы гуляете с ребёнком</span>
+        <span class="option-note">смотреть на одно и то же вдвоём</span>
+        <span class="option-sub">с ребёнком, с партнёром, с другом</span>
       </button>
       <button type="button" class="option" data-mode="с-собакой">
         <span class="option-name">С собакой</span>
-        <span class="option-note">если вы и так гуляете дважды в день по одному кругу</span>
+        <span class="option-note">занять те десять минут, пока она нюхает столб</span>
+        <span class="option-sub">задание помещается в паузу, которую она и так делает</span>
       </button>
       <button type="button" class="option" data-mode="полевой-дневник">
         <span class="option-name">Полевой дневник</span>
-        <span class="option-note">если вам нравится записывать</span>
+        <span class="option-note">одна фраза за прогулку</span>
+        <span class="option-sub">через месяц — архив своего района, которого нет больше ни у кого</span>
       </button>
     </div>
 
     <div class="sub" id="sub-level" hidden>
       <h2 class="section-title" id="level-title">Уровень</h2>
+      <p class="sub-intro muted">Если трудно выйти и вы гуляете в наушниках.</p>
       <div class="options options-level" role="group" aria-labelledby="level-title" id="level-list">
         <button type="button" class="option" data-level="1">
           <span class="option-name">1</span>
@@ -79,6 +85,12 @@
         <button type="button" class="option option-small" data-age="4-5"><span class="option-name">4–5</span></button>
         <button type="button" class="option option-small" data-age="6-8"><span class="option-name">6–8</span></button>
         <button type="button" class="option option-small" data-age="9-12"><span class="option-name">9–12</span></button>
+      </div>
+      <div class="options" id="age-adult" hidden>
+        <button type="button" class="option" data-age="со-взрослым">
+          <span class="option-name">Со взрослым</span>
+          <span class="option-note">партнёр или друг</span>
+        </button>
       </div>
     </div>
 
@@ -212,10 +224,59 @@
         загрузилась, отбор идёт по свету и сезону.</p>
     </div>
 
-    <h3 class="section-title">Психологическая валидация проекта</h3>
-    <p class="about-text credit">Диана Наумова<br>
-      <span class="muted">Психолог в КПТ-подходе, студентка магистратуры НИУ ВШЭ
-      «Консультативная психология»</span></p>
+    <h3 class="section-title">Об авторах</h3>
+    <div class="people">
+      <div class="person">
+        <p class="person-role">Идея и реализация</p>
+        <p class="person-name">Ксения Скуратова</p>
+        <p class="person-about">Научная сотрудница лаборатории физиологии зрения
+          Института физиологии им. И. П. Павлова</p>
+      </div>
+      <div class="person">
+        <p class="person-role">Психологическая валидация проекта</p>
+        <p class="person-name">Диана Наумова</p>
+        <p class="person-about">Психолог в КПТ-подходе, студентка магистратуры НИУ ВШЭ
+          «Консультативная психология»</p>
+        <p class="person-links">
+          <a href="https://www.b17.ru/naumova_diana/" target="_blank" rel="noopener noreferrer">https://www.b17.ru/naumova_diana/</a> ·
+          <a href="https://t.me/naumovadia" target="_blank" rel="noopener noreferrer">https://t.me/naumovadia</a>
+        </p>
+      </div>
+    </div>
+
+    <h3 class="section-title">На чём это основано</h3>
+    <div class="about-text">
+      <p>Карточки не придуманы на глаз: каждая опирается на конкретный механизм
+        из психологии внимания или физиологии восприятия.</p>
+      <ul class="grounds">
+        <li>Тревогу поддерживает не содержание мыслей, а то, что внимание залипает на себе.
+          Внимание при этом — навык, который тренируется (метакогнитивная модель, Уэллс).</li>
+        <li>Перенос фокуса на внешнюю задачу разработан как отдельная процедура и изначально
+          рассчитан на выполнение вне кабинета (task concentration training).</li>
+        <li>Действие первично по отношению к состоянию: ждать подходящего настроения не нужно
+          (поведенческая активация).</li>
+        <li>Заметить мысль, не вступая с ней в спор, — отдельный навык, и мишень здесь
+          не контроль состояния (дефузия, ACT).</li>
+        <li>Что человек вообще способен заметить, зависит от освещённости, погоды и времени
+          года: в сумерках цвет исчезает раньше формы, на морозе город почти не пахнет,
+          в темноте слабый свет виден боковым зрением. Поэтому сайт считает высоту солнца
+          и погоду и выдаёт только то, что сегодня выполнимо.</li>
+      </ul>
+    </div>
+
+    <h3 class="section-title">Чего мы не утверждаем</h3>
+    <div class="about-text">
+      <ul class="grounds">
+        <li>Мы не заявляем, что карточки снижают тревожность. Данных об этом нет.
+          Мы заявляем механизм — расширение фокуса внимания.</li>
+        <li>Методики, на которых всё построено, проверялись в работе со специалистом.
+          Перенос в самостоятельное приложение — обоснованное предположение,
+          а не воспроизведение протокола.</li>
+        <li>Это инструмент самопомощи, не лечение и не замена терапии. При паническом
+          расстройстве, ПТСР и выраженной агорафобии пользоваться стоит
+          вместе со специалистом.</li>
+      </ul>
+    </div>
 
     <h3 class="section-title" id="theme-label">Тема</h3>
     <div class="options options-row" role="group" aria-labelledby="theme-label" id="theme-list">
@@ -240,8 +301,6 @@
     </div>
 
     <footer class="footer">
-      <p>Это инструмент самопомощи, а не лечение и не замена терапии. При паническом расстройстве,
-        ПТСР и выраженной агорафобии пользоваться им стоит вместе со специалистом.</p>
       <p class="links"><button type="button" class="link" data-go="return">Назад</button></p>
     </footer>
   </div>
