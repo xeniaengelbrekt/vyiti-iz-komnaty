@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сквозные проверки</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 24px; max-width: 920px; }
+  h1 { font: 400 24px/1.2 Georgia, serif; }
+  h2 { font: 400 19px/1.2 Georgia, serif; margin: 30px 0 8px; }
+  table { border-collapse: collapse; width: 100%; }
+  td { padding: 5px 10px 5px 0; border-bottom: 1px solid #E3E8EC; vertical-align: top; }
+  td:first-child { width: 58%; }
+  .ok { color: #1F7A3D; }
+  .no { color: #A82020; font-weight: 600; }
+  .warn { color: #946200; }
+  .note { color: #5A6B7B; }
+</style>
+</head>
+<body>
+<h1>Сквозные проверки</h1>
+<p class="note">Каждый сценарий открывает сайт в отдельном кадре шириной с телефон,
+нажимает кнопки и читает экран, как человек. Открывать с того же адреса, что и сайт:
+<code>/tests/e2e.html</code>. Оранжевое — известный пробел колоды, он не считается провалом.</p>
+<div id="out">Считаю…</div>
+
+<script src="report.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var out = document.getElementById('out');
+  var table = null;
+  var failures = 0;
+  var frames = [];
+
+  /* ——— вывод ——— */
+
+  function section(title) {
+    var h = document.createElement('h2');
+    h.textContent = title;
+    out.appendChild(h);
+    table = document.createElement('table');
+    out.appendChild(table);
+  }
+
+  function row(name, cls, detail) {
+    var tr = table.insertRow();
+    tr.insertCell().textContent = name;
+    var c = tr.insertCell();
+    c.className = cls;
+    c.textContent = detail;
+  }
+
+  function check(name, cond, detail) {
+    if (!cond) failures++;
+    row(name, cond ? 'ok' : 'no', cond ? 'так' : 'НЕ ТАК' + (detail ? ': ' + detail : ''));
+  }
+
+  function eq(name, got, want) {
+    var g = JSON.stringify(got), w = JSON.stringify(want);
+    check(name, g === w, g + ' вместо ' + w);
+  }
+
+  /* известный пробел колоды: не провал, но и не молчание */
+  function gap(name, cond, detail) {
+    row(name, cond ? 'ok' : 'warn', cond ? 'так' : 'известный пробел: ' + detail);
+  }
+
+  /* ——— кадр с сайтом ——— */
+
+  var SPB = { lat: 59.9386, lon: 30.3141, name: 'Петербург', source: 'city' };
+
+  /* Состояние и погода кладутся заранее: сценарии не зависят ни от сети,
+     ни от времени суток, ни от прошлых прогонов. */
+  function seed(extra, opts) {
+    opts = opts || {};
+    localStorage.clear();
+    var st = { mode: null, level: 1, age: '4-5', theme: 'dark', place: SPB,
+               sessions: 9, lastDay: null, recent: [], introSeen: true };
+    for (var k in (extra || {})) st[k] = extra[k];
+    localStorage.setItem('vyiti:state', JSON.stringify(st));
+    if (!opts.noWeather) {
+      localStorage.setItem('vyiti:weather', JSON.stringify({
+        lat: 59.94, lon: 30.31, at: Date.now(), tags: opts.weather || ['облачно', 'сухо']
+      }));
+    }
+  }
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function open(width, height) {
+    return new Promise(function (resolve) {
+      var f = document.createElement('iframe');
+      f.setAttribute('title', 'проверяемый сайт');
+      f.style.cssText = 'position:absolute;left:-14000px;top:0;border:0;width:' +
+        (width || 375) + 'px;height:' + (height || 812) + 'px';
+      f.addEventListener('load', function () {
+        setTimeout(function () { resolve(f.contentWindow); }, 200);
+      });
+      f.src = '../index.html';
+      document.body.appendChild(f);
+      frames.push(f);
+    });
+  }
+
+  function frameOf(w) {
+    for (var i = 0; i < frames.length; i++) if (frames[i].contentWindow === w) return frames[i];
+    return null;
+  }
+
+  function reload(w) {
+    return new Promise(function (resolve) {
+      var f = frameOf(w);
+      var onLoad = function () {
+        f.removeEventListener('load', onLoad);
+        setTimeout(function () { resolve(f.contentWindow); }, 200);
+      };
+      f.addEventListener('load', onLoad);
+      w.location.reload();
+    });
+  }
+
+  function close(w) {
+    var f = frameOf(w);
+    if (f) { f.remove(); frames.splice(frames.indexOf(f), 1); }
+  }
+
+  /* ——— чтение экрана ——— */
+
+  /* первый аргумент — окно кадра или любой элемент внутри него */
+  function scope(x) { return x.document ? x.document : x; }
+  function q(x, s) { return scope(x).querySelector(s); }
+  function qa(x, s) { return Array.prototype.slice.call(scope(x).querySelectorAll(s)); }
+  function plain(el) { return el.textContent.replace(/\s+/g, ' ').trim(); }   // без text-transform
+  function shown(el) { return !!el && el.getClientRects().length > 0; }
+  function screenName(w) { return q(w, '.screen:not([hidden])').getAttribute('data-screen'); }
+  function words(el) { return (el.innerText || '').replace(/\s+/g, ' ').trim(); }
+  function click(w, s) { (typeof s === 'string' ? q(w, s) : s).click(); }
+  function size(w, s) { return parseFloat(w.getComputedStyle(q(w, s)).fontSize); }
+
+  function darkEvening(w) {
+    w.Sun.category = function () { return 'темнота'; };
+    w.Sun.season = function () { return 'осень'; };
+  }
+
+  async function take(w) { click(w, '#btn-take'); await sleep(400); }
+  async function another(w) { click(w, '#btn-another'); await sleep(350); }
+  async function done(w) { click(w, '#btn-done'); await sleep(300); }
+
+  function cardNow(w) {
+    var t = q(w, '#card-text').textContent;
+    return w.KOLODA.filter(function (c) { return c.text === t; })[0] || null;
+  }
+
+  /* все слова, которые человек может увидеть на любом экране */
+  function everyScreenText(w) {
+    return qa(w, '.screen').map(function (s) { return s.textContent; }).join(' ');
+  }
+
+  /* ——— сценарии ——— */
+
+  async function scenario(title, fn) {
+    section(title);
+    try { await fn(); }
+    catch (e) {
+      failures++;
+      row('сценарий не дошёл до конца', 'no', String(e && e.message || e));
+    }
+  }
+
+  var BANNED = ['балл', 'очк', 'достижен', 'рейтинг', 'streak', 'поздрав', 'молодец',
+                'уведомл', 'напомин', 'подписк', 'регистрац', 'прогресс', 'отлично', 'супер'];
+
+  async function run() {
+
+    await scenario('Скрипты разбираются без ошибок', async function () {
+      var files = ['sun', 'weather', 'store', 'deck', 'app'];
+      for (var i = 0; i < files.length; i++) {
+        var text = await (await fetch('../js/' + files[i] + '.js')).text();
+        var err = '';
+        try { new Function(text); } catch (e) { err = e.message; }
+        check('js/' + files[i] + '.js', err === '', err);
+      }
+      var sw = await (await fetch('../sw.js')).text();
+      var swErr = '';
+      try { new Function(sw); } catch (e) { swErr = e.message; }
+      check('sw.js', swErr === '', swErr);
+    });
+
+    await scenario('Первый заход: приветствие', async function () {
+      seed({ introSeen: false, mode: null });
+      var w = await open();
+      eq('первым открывается приветствие', screenName(w), 'intro');
+      check('заголовок в фокусе', w.document.activeElement.id === 'intro-title');
+      var t = words(q(w, '#screen-intro'));
+      check('рассказывает, для чего проект', /тренировка внимания/.test(t) && /Никуда ехать/.test(t));
+      eq('пять шагов «как пользоваться»', qa(w, '#screen-intro .steps li').length, 5);
+      check('объясняет, зачем оборот скрыт до «Готово»', /скрыто нарочно/.test(t));
+      check('объясняет, зачем нужно место', /определить место/.test(t) && /свет и погоду/.test(t));
+      check('говорит, где хранятся данные', /только в этом браузере/.test(t));
+      check('дисклеймер на месте', /не лечение и не замена терапии/.test(t));
+      check('в приветствии нет обещаний состояния',
+            !/станет (спокойн|легче)|успоко|расслаб|избав/i.test(t));
+      check('одна кнопка «Понятно»', words(q(w, '#btn-intro-ok')) === 'Понятно' &&
+            qa(w, '#screen-intro .btn').length === 1);
+      check('кнопка не меньше 56 px', q(w, '#btn-intro-ok').getBoundingClientRect().height >= 56);
+      click(w, '#btn-intro-ok'); await sleep(200);
+      eq('после «Понятно» — старт', screenName(w), 'start');
+      w = await reload(w);
+      eq('после перезагрузки приветствие не возвращается', screenName(w), 'start');
+      click(w, '[data-go="intro"]'); await sleep(200);
+      eq('ссылка «Как это работает» открывает его снова', screenName(w), 'intro');
+      click(w, '#btn-intro-ok'); await sleep(200);
+      eq('и «Понятно» возвращает на старт', screenName(w), 'start');
+      close(w);
+    });
+
+    await scenario('Главный экран', async function () {
+      seed({});
+      var w = await open();
+      eq('открывается старт', screenName(w), 'start');
+      eq('название', words(q(w, '#start-title')), 'Выйти из комнаты');
+      var leads = qa(w, '#screen-start .lead').map(words);
+      eq('подзаголовок', leads[0], 'Одна карточка на прогулку. Маршрут тот же.');
+      eq('третья строка', leads[1],
+         'Никуда ехать не надо. Всё, что нужно, есть во дворе, где вы ходите каждый день, — просто вы на это не смотрели.');
+      var modes = qa(w, '#mode-list .option');
+      eq('пять режимов в нужном порядке',
+         modes.map(function (m) { return words(q(m, '.option-name')); }),
+         ['Наружу', 'Читать место', 'Совместное внимание', 'С собакой', 'Полевой дневник']);
+      check('у каждого режима подпись и строка ниже',
+            modes.every(function (m) { return words(q(m, '.option-note')) && words(q(m, '.option-sub')); }));
+      check('строка ниже мельче и приглушённее подписи',
+            modes.every(function (m) {
+              var note = m.querySelector('.option-note'), sub = m.querySelector('.option-sub');
+              return parseFloat(w.getComputedStyle(sub).fontSize) < parseFloat(w.getComputedStyle(note).fontSize) &&
+                     w.getComputedStyle(sub).color !== w.getComputedStyle(note).color;
+            }));
+      check('фразы «если трудно выйти» на главном экране нет',
+            !/если трудно выйти/i.test(words(q(w, '#screen-start'))));
+      check('режим не выбран — главная кнопка выключена', q(w, '#btn-take').disabled);
+      click(w, '[data-mode="наружу"]'); await sleep(100);
+      check('после выбора кнопка включена', !q(w, '#btn-take').disabled);
+      check('появился выбор уровня', shown(q(w, '#sub-level')));
+      check('фраза про наушники видна после клика',
+            /Если трудно выйти и вы гуляете в наушниках/.test(words(q(w, '#sub-level'))));
+      eq('три уровня', qa(w, '#level-list .option').length, 3);
+      check('в одну попытку: нажатие сразу меняет выбор',
+            q(w, '[data-mode="наружу"]').getAttribute('aria-pressed') === 'true');
+      click(w, '[data-mode="совместное-внимание"]'); await sleep(100);
+      eq('ступени по возрасту, ребёнок первым, «со взрослым» последним',
+         qa(w, '#age-list .option, #age-adult .option').map(function (o) { return words(q(o, '.option-name')); }),
+         ['2–3', '4–5', '6–8', '9–12', 'Со взрослым']);
+      check('у «со взрослым» подпись «партнёр или друг»',
+            /партнёр или друг/.test(words(q(w, '#age-adult'))));
+      click(w, '[data-age="6-8"]'); await sleep(100);
+      w = await reload(w);
+      eq('режим сохраняется', JSON.parse(localStorage.getItem('vyiti:state')).mode, 'совместное-внимание');
+      check('возраст сохраняется', q(w, '[data-age="6-8"]').getAttribute('aria-pressed') === 'true');
+      check('на старте есть навигация',
+            words(q(w, '#screen-start nav')).indexOf('Дневник') >= 0 &&
+            words(q(w, '#screen-start nav')).indexOf('О проекте') >= 0);
+      check('дисклеймер в подвале старта', /не лечение и не замена терапии/.test(words(q(w, '#screen-start .footer'))));
+      close(w);
+    });
+
+    await scenario('Экран карточки', async function () {
+      seed({ mode: 'наружу', level: 2 });
+      var w = await open();
+      darkEvening(w);
+      await take(w);
+      eq('открылась карточка', screenName(w), 'card');
+      check('фокус на задании', w.document.activeElement.id === 'card-text');
+      var visible = qa(w, '#screen-card button, #screen-card summary, #screen-card a').filter(shown);
+      eq('на экране только «Зачем это», «Готово», «Другую»',
+         visible.map(words).sort(), ['Готово', 'Другую', 'Зачем это'].sort());
+      check('навигации на экране карточки нет',
+            qa(w, '#screen-card [data-go], #screen-card nav, #screen-card .links').length === 0);
+      var done_ = q(w, '#btn-done').getBoundingClientRect(), other = q(w, '#btn-another').getBoundingClientRect();
+      check('кнопки не меньше 56 px', done_.height >= 56 && other.height >= 56);
+      check('между кнопками зазор не меньше 16 px', other.top - done_.bottom >= 16);
+      check('кнопки у нижнего края, под большим пальцем',
+            w.innerHeight - other.bottom <= 60);
+      check('«Зачем это» заметно мельче кнопок',
+            size(w, '#card-why summary') < size(w, '#btn-done'));
+      check('кегль задания не меньше 20 px', size(w, '#card-text') >= 20);
+      eq('«Зачем это» свёрнуто', q(w, '#card-why').open, false);
+
+      // «Другую»: без вопросов, без ограничений
+      var seen = {};
+      for (var i = 0; i < 10; i++) {
+        seen[q(w, '#card-text').textContent] = true;
+        await another(w);
+        if (screenName(w) !== 'card') break;
+      }
+      eq('десять нажатий «Другую» подряд, и экран тот же', screenName(w), 'card');
+      check('карточки меняются', Object.keys(seen).length >= 3, Object.keys(seen).length + ' разных');
+      check('«Другую» не спрашивает причину',
+            qa(w, 'dialog, [role="dialog"], [role="alertdialog"]').length === 0);
+
+      // оборот скрыт до «Готово»
+      var leaked = 0;
+      for (var j = 0; j < 12; j++) {
+        var c = cardNow(w);
+        if (c && words(q(w, '#screen-card')).indexOf(c.back.slice(0, 40)) >= 0) leaked++;
+        await another(w);
+      }
+      eq('оборот конкретной карточки на её экране не виден (12 карточек)', leaked, 0);
+
+      // «Зачем это»
+      var c2 = cardNow(w);
+      click(w, '#card-why summary'); await sleep(250);
+      check('«Зачем это» раскрывается на том же экране', q(w, '#card-why').open && screenName(w) === 'card');
+      var why = words(q(w, '#card-why'));
+      check('в нём «Что считается выполненным» и «Зачем такие задания»',
+            /Что считается выполненным/i.test(why) && /Зачем такие задания/i.test(why));
+      check('критерий берётся из карточки', !c2.criterion || why.indexOf(c2.criterion) >= 0);
+      check('текст режима «Наружу»', /уводит внимание с себя/.test(why));
+      check('оборот карточки там не показан', why.indexOf(c2.back.slice(0, 40)) < 0);
+      check('задание осталось на экране целиком', q(w, '#card-text').getBoundingClientRect().top >= 0);
+      check('прокрутки нет', w.document.documentElement.scrollHeight - w.innerHeight <= 8,
+            (w.document.documentElement.scrollHeight - w.innerHeight) + ' px');
+      click(w, '#card-why summary'); await sleep(250);
+      eq('сворачивается обратно', q(w, '#card-why').open, false);
+      click(w, '#card-why summary'); await sleep(150);
+      await another(w);
+      eq('на следующей карточке снова свёрнуто', q(w, '#card-why').open, false);
+      close(w);
+    });
+
+    await scenario('«Зачем это»: текст каждого режима', async function () {
+      var expect = {
+        'наружу': /уводит внимание с себя на то, что вокруг/,
+        'читать-место': /признак, который сработает и на следующем доме/,
+        'совместное-внимание': /один называет, другой подхватывает/,
+        'с-собакой': /занимает паузу, которую она и так делает/,
+        'полевой-дневник': /Одна фраза о том, что снаружи/
+      };
+      for (var mode in expect) {
+        seed({ mode: mode, level: 1, age: '6-8' });
+        var w = await open();
+        await take(w);
+        click(w, '#card-why summary'); await sleep(200);
+        check(mode, expect[mode].test(words(q(w, '#why-mode'))), words(q(w, '#why-mode')));
+        close(w);
+      }
+    });
+
+    await scenario('Подсказка «Если не получается»', async function () {
+      var cases = [['2-3', true], ['4-5', true], ['6-8', false], ['9-12', false]];
+      for (var i = 0; i < cases.length; i++) {
+        seed({ mode: 'совместное-внимание', age: cases[i][0] });
+        var w = await open();
+        await take(w);
+        var hint = q(w, '#card-hint');
+        check(cases[i][0] + ': подсказка есть', !hint.hidden);
+        check(cases[i][0] + (cases[i][1] ? ': раскрыта сразу' : ': под ссылкой'),
+              hint.open === cases[i][1]);
+        if (i === 0) {
+          check('подпись «Если не получается»', words(q(w, '#card-hint summary')) === 'Если не получается');
+          check('раскрытая подсказка видна без прокрутки',
+                hint.getBoundingClientRect().bottom <= w.innerHeight);
+        }
+        close(w);
+      }
+      seed({ mode: 'совместное-внимание', age: 'со-взрослым' });
+      var a = await open();
+      await take(a);
+      check('со взрослым: подсказки нет', q(a, '#card-hint').hidden);
+      click(a, '#card-why summary');
+      await sleep(200);
+      check('текст про взаимную работу', /Проверять друг друга не нужно/.test(words(q(a, '#why-mode'))));
+      close(a);
+    });
+
+    await scenario('Оборот и конец — один экран', async function () {
+      seed({ mode: 'наружу', level: 2 });
+      var w = await open();
+      darkEvening(w);
+      await take(w);
+      var task = cardNow(w);
+      var taskSize = size(w, '#card-text');
+      await done(w);
+      eq('после «Готово» — оборот', screenName(w), 'back');
+      check('фокус на заголовке', w.document.activeElement.id === 'back-title');
+      eq('кнопок на экране нет — «Дальше» удалена', qa(w, '#screen-back .btn').length, 0);
+      check('слова «Дальше» нет', words(q(w, '#screen-back')).indexOf('Дальше') < 0);
+      eq('сверху повторено выполненное задание', words(q(w, '#done-task')), task.text);
+      eq('заголовок оборота', words(q(w, '#back-title')), task.title);
+      eq('оборот', words(q(w, '#back-text')), task.back);
+      eq('строка «На сегодня всё.»', words(q(w, '.closing')), 'На сегодня всё.');
+
+      var order = ['#done-task', '#back-title', '#back-text', '.closing', '#screen-back nav'];
+      var ordered = true;
+      for (var i = 1; i < order.length; i++) {
+        var a = q(w, order[i - 1]), b = q(w, order[i]);
+        if (!(a.compareDocumentPosition(b) & 4)) ordered = false;
+      }
+      check('порядок: задание, заголовок, оборот, «на сегодня всё», навигация', ordered);
+
+      var ratio = taskSize / size(w, '#done-task');
+      check('повторённое задание примерно в полтора раза мельче основного',
+            ratio >= 1.25 && ratio <= 1.9, ratio.toFixed(2) + ' раза');
+      check('и приглушено',
+            w.getComputedStyle(q(w, '#done-task')).color !== w.getComputedStyle(q(w, '#back-text')).color);
+
+      eq('ссылки',
+         qa(w, '#screen-back nav .link').map(words),
+         ['Ещё одну', 'Дневник', 'О проекте', 'Сменить режим']);
+      check('навигация мельче задания', size(w, '#screen-back .link') < taskSize);
+      check('«Ещё одну» не выделена: тот же вид, что у остальных ссылок',
+            w.getComputedStyle(q(w, '#btn-more')).color === w.getComputedStyle(q(w, '[data-go="about"]')).color);
+      check('нет прогресса и счёта выполненного', !/\d+\s*из\s*\d+|выполнено|сегодня уже/i.test(words(q(w, '#screen-back'))));
+      check('навигация на первом экране телефона',
+            q(w, '#screen-back nav').getBoundingClientRect().bottom <= w.innerHeight);
+      check('прокрутки нет', w.document.documentElement.scrollHeight - w.innerHeight <= 8);
+
+      click(w, '[data-go="start"]'); await sleep(200);
+      eq('«Сменить режим» ведёт на старт', screenName(w), 'start');
+      await take(w); await done(w);
+      click(w, '#btn-more'); await sleep(400);
+      eq('«Ещё одну» выдаёт новую карточку', screenName(w), 'card');
+      close(w);
+    });
+
+    await scenario('Навигация только там, где можно', async function () {
+      seed({ mode: 'с-собакой' });
+      var w = await open();
+      var navShown = function () { return qa(w, 'nav').filter(shown).length; };
+      eq('старт: навигация видна', navShown(), 1);
+      await take(w);
+      eq('карточка: навигации нет', navShown(), 0);
+      await done(w);
+      eq('оборот: навигация видна', navShown(), 1);
+      close(w);
+    });
+
+    await scenario('Полевой дневник', async function () {
+      seed({ mode: 'полевой-дневник' });
+      var w = await open();
+      await take(w);
+      await done(w);
+      eq('после «Готово» — поле записи', screenName(w), 'note');
+      var field = q(w, '#note-input');
+      eq('жёсткий предел 140 символов', field.maxLength, 140);
+      check('счётчика символов нет',
+            !/140|осталось|символ|\d+\s*\/\s*\d+/i.test(words(q(w, '#screen-note')).replace(words(q(w, '#note-task')), '')));
+      var long = new Array(201).join('я');
+      field.value = long;
+      q(w, '#note-form').dispatchEvent(new w.Event('submit', { cancelable: true, bubbles: true }));
+      await sleep(250);
+      eq('после записи — оборот', screenName(w), 'back');
+      var diary = JSON.parse(localStorage.getItem('vyiti:diary'));
+      check('длинная запись обрезана до 140', diary.length === 1 && diary[0].text.length <= 140,
+            diary[0] && diary[0].text.length);
+
+      click(w, '#btn-more'); await sleep(400);
+      await done(w);
+      q(w, '#note-input').value = 'Вторая запись.';
+      q(w, '#note-form').dispatchEvent(new w.Event('submit', { cancelable: true, bubbles: true }));
+      await sleep(250);
+      click(w, '#screen-back [data-go="archive"]'); await sleep(250);
+      eq('архив открылся', screenName(w), 'archive');
+      var items = qa(w, '#archive-list li');
+      eq('две записи', items.length, 2);
+      check('в обратном порядке: сначала новая', /Вторая запись\./.test(items[0].textContent));
+      check('у каждой есть дата', items.every(function (li) { return li.querySelector('time') && /\d{4}/.test(li.querySelector('time').textContent); }));
+      var archiveText = words(q(w, '#screen-archive'));
+      check('без статистики, оценок и сравнений',
+            !/всего|в среднем|серия|график|оцен|по сравнению|вы писали об этом/i.test(archiveText));
+      click(w, '#screen-archive [data-go="return"]'); await sleep(200);
+      eq('«Назад» возвращает на оборот', screenName(w), 'back');
+      close(w);
+
+      seed({});
+      var e = await open();
+      click(e, '[data-go="archive"]'); await sleep(200);
+      check('пустой архив: «Записей нет.»', /Записей нет/.test(words(q(e, '#screen-archive'))));
+      close(e);
+    });
+
+    await scenario('Правило: не больше одной звуковой карточки из трёх', async function () {
+      seed({ mode: 'наружу', level: 2 });
+      var w = await open();
+      w.Sun.category = function () { return 'день'; };
+      w.Sun.season = function () { return 'осень'; };
+      await take(w);
+      var seq = [];
+      for (var i = 0; i < 40; i++) {
+        seq.push(w.Deck.isSound(cardNow(w)));
+        await done(w);
+        click(w, '#btn-more'); await sleep(350);
+      }
+      var broken = 0;
+      for (var k = 3; k < seq.length; k++) {
+        var recent = seq.slice(k - 3, k).filter(Boolean).length;
+        if (recent >= 2 && seq[k]) broken++;
+      }
+      eq('после двух звуковых из трёх следующая не звуковая', broken, 0);
+      check('звуковые при этом выдаются', seq.filter(Boolean).length >= 3,
+            seq.filter(Boolean).length + ' из ' + seq.length);
+      close(w);
+    });
+
+    await scenario('Ступени не смешиваются', async function () {
+      var checks = [
+        [{ mode: 'наружу', level: 1 }, function (c) { return c.mode === 'наружу' && c.level === 1; }, 'уровень 1'],
+        [{ mode: 'наружу', level: 3 }, function (c) { return c.mode === 'наружу' && c.level === 3; }, 'уровень 3'],
+        [{ mode: 'совместное-внимание', age: '2-3' }, function (c) { return c.age === '2-3'; }, 'возраст 2–3'],
+        [{ mode: 'совместное-внимание', age: 'со-взрослым' }, function (c) { return c.age === 'со-взрослым'; }, 'со взрослым']
+      ];
+      for (var i = 0; i < checks.length; i++) {
+        seed(checks[i][0]);
+        var w = await open();
+        darkEvening(w);
+        await take(w);
+        var bad = 0;
+        for (var n = 0; n < 12; n++) {
+          var c = cardNow(w);
+          if (!c || !checks[i][1](c)) bad++;
+          await another(w);
+        }
+        eq(checks[i][2] + ': все 12 карточек из своей ступени', bad, 0);
+        close(w);
+      }
+    });
+
+    await scenario('Тёмный осенний вечер: ни одна ступень не пустеет', async function () {
+      var configs = [
+        ['Наружу, уровень 1', { mode: 'наружу', level: 1 }],
+        ['Наружу, уровень 2', { mode: 'наружу', level: 2 }],
+        ['Наружу, уровень 3', { mode: 'наружу', level: 3 }],
+        ['Читать место', { mode: 'читать-место' }],
+        ['Совместное внимание, 2–3', { mode: 'совместное-внимание', age: '2-3' }],
+        ['Совместное внимание, 4–5', { mode: 'совместное-внимание', age: '4-5' }],
+        ['Совместное внимание, 6–8', { mode: 'совместное-внимание', age: '6-8' }],
+        ['Совместное внимание, 9–12', { mode: 'совместное-внимание', age: '9-12' }],
+        ['Совместное внимание, со взрослым', { mode: 'совместное-внимание', age: 'со-взрослым' }],
+        ['С собакой', { mode: 'с-собакой' }],
+        ['Полевой дневник', { mode: 'полевой-дневник' }]
+      ];
+      for (var i = 0; i < configs.length; i++) {
+        seed(configs[i][1], { weather: ['облачно', 'сухо', 'мороз'] });
+        var w = await open();
+        darkEvening(w);
+        await take(w);
+        var texts = {}, empty = 0;
+        for (var n = 0; n < 8; n++) {
+          if (screenName(w) !== 'card' || !shown(q(w, '#btn-done'))) { empty++; break; }
+          texts[q(w, '#card-text').textContent] = true;
+          await another(w);
+        }
+        var distinct = Object.keys(texts).length;
+        check(configs[i][0] + ': карточка выдаётся каждый раз', empty === 0);
+        if (configs[i][0].indexOf('со взрослым') >= 0) {
+          gap(configs[i][0] + ': в тёмный вечер больше двух разных', distinct >= 3,
+              'всего ' + distinct + ' — подходит одна карточка, СВ-51');
+        } else {
+          check(configs[i][0] + ': в тёмный вечер больше двух разных', distinct >= 3, distinct + ' разных');
+        }
+        close(w);
+      }
+    });
+
+    await scenario('Новичку не выдаются карточки, требующие памяти о месте', async function () {
+      seed({ mode: 'наружу', level: 1, sessions: 0 }, {});
+      var w = await open();
+      darkEvening(w);
+      await take(w);
+      var memory = 0;
+      for (var i = 0; i < 25; i++) {
+        var c = cardNow(w);
+        if (c && c.needsHistory) memory++;
+        await another(w);
+      }
+      eq('за 25 карточек ни одной с needsHistory', memory, 0);
+      close(w);
+    });
+
+    await scenario('Погода и место', async function () {
+      // сеть недоступна: сайт работает, ошибку не показывает
+      seed({ mode: 'наружу', level: 2 }, { noWeather: true });
+      var w = await open();
+      w.fetch = function () { return Promise.reject(new TypeError('Failed to fetch')); };
+      click(w, '#btn-take'); await sleep(1800);
+      eq('без погоды карточка всё равно выдана', screenName(w), 'card');
+      check('ошибки на экране нет', !/ошибк|не удалось|сбой|offline|нет сети/i.test(words(q(w, '#screen-card'))));
+      close(w);
+
+      // отказ в геолокации: короткий список городов
+      seed({ place: null, mode: 'наружу' });
+      var g = await open();
+      Object.defineProperty(g.navigator, 'geolocation', {
+        configurable: true,
+        value: { getCurrentPosition: function (ok, fail) { fail({ code: 1 }); } }
+      });
+      check('место не выбрано: выбор города скрыт', !shown(q(g, '#city-picker')));
+      click(g, '#btn-geo'); await sleep(250);
+      check('после отказа предложен выбор города', shown(q(g, '#city-picker')));
+      eq('в списке Москва и Петербург',
+         qa(g, '#city-picker [data-city]').map(words), ['Москва', 'Петербург']);
+      check('есть поле для другого города', shown(q(g, '#city-input')));
+      click(g, '[data-city="мск"]'); await sleep(250);
+      var st = JSON.parse(localStorage.getItem('vyiti:state'));
+      eq('выбор города сохранён', st.place && st.place.name, 'Москва');
+      check('блок места свернулся в строку', /Место: Москва/.test(words(q(g, '#place-state'))) &&
+            q(g, '#place-actions').hidden && !q(g, '#btn-place-change').hidden);
+      click(g, '#btn-place-change'); await sleep(150);
+      check('«изменить» раскрывает выбор снова', !q(g, '#place-actions').hidden);
+      close(g);
+
+      // без места сайт работает
+      seed({ place: null, mode: 'с-собакой' });
+      var n = await open();
+      await take(n);
+      eq('без места карточка выдаётся', screenName(n), 'card');
+      close(n);
+    });
+
+    await scenario('Тема', async function () {
+      seed({ theme: 'auto' });
+      var w = await open();
+      w.Sun.category = function () { return 'темнота'; };
+      click(w, '[data-theme-set="auto"]'); await sleep(100);
+      eq('«по свету» в темноте — тёмная', w.document.documentElement.dataset.theme, 'dark');
+      w.Sun.category = function () { return 'сумерки'; };
+      click(w, '[data-theme-set="auto"]'); await sleep(100);
+      eq('в сумерках — тёмная', w.document.documentElement.dataset.theme, 'dark');
+      w.Sun.category = function () { return 'день'; };
+      click(w, '[data-theme-set="auto"]'); await sleep(100);
+      eq('днём — светлая', w.document.documentElement.dataset.theme, 'light');
+      click(w, '[data-theme-set="dark"]'); await sleep(100);
+      eq('ручной выбор «тёмная»', w.document.documentElement.dataset.theme, 'dark');
+      click(w, '[data-theme-set="light"]'); await sleep(100);
+      eq('ручной выбор «светлая»', w.document.documentElement.dataset.theme, 'light');
+      w = await reload(w);
+      eq('выбор переживает перезагрузку', w.document.documentElement.dataset.theme, 'light');
+      close(w);
+    });
+
+    await scenario('Экран «О проекте»', async function () {
+      seed({});
+      var w = await open();
+      click(w, '[data-go="about"]'); await sleep(250);
+      eq('открылся', screenName(w), 'about');
+      var heads = qa(w, '#screen-about .section-title').map(plain);
+      eq('разделы по порядку', heads.slice(0, 3), ['Об авторах', 'На чём это основано', 'Чего мы не утверждаем']);
+      check('«Об авторах» после описания и до настроек',
+            heads.indexOf('Об авторах') < heads.indexOf('Тема'));
+      var people = qa(w, '.person');
+      eq('двое авторов', people.length, 2);
+      eq('имена', people.map(function (p) { return plain(q(p, '.person-name')); }),
+         ['Ксения Скуратова', 'Диана Наумова']);
+      eq('роли', people.map(function (p) { return plain(q(p, '.person-role')); }),
+         ['Идея и реализация', 'Психологическая валидация проекта']);
+      check('описание Ксении', /лаборатории физиологии зрения Института физиологии им\. И\. П\. Павлова/.test(words(people[0])));
+      check('описание Дианы', /студентка магистратуры НИУ ВШЭ «Консультативная психология»/.test(words(people[1])));
+      var links = qa(w, '.person a');
+      eq('две ссылки у Дианы', links.map(function (a) { return a.getAttribute('href'); }),
+         ['https://www.b17.ru/naumova_diana/', 'https://t.me/naumovadia']);
+      check('ссылки открываются в новой вкладке и безопасно',
+            links.every(function (a) { return a.target === '_blank' && /noopener/.test(a.rel); }));
+      check('имена шрифтом с засечками, роли мелким приглушённым',
+            /Iowan|Palatino|Georgia|Noto Serif|serif/i.test(w.getComputedStyle(q(w, '.person-name')).fontFamily) &&
+            size(w, '.person-role') < size(w, '.person-about') &&
+            w.getComputedStyle(q(w, '.person-role')).color !== w.getComputedStyle(q(w, '.person-about')).color);
+      check('без фотографий и иконок', qa(w, '#screen-about img, #screen-about svg').length === 0);
+      var grounds = qa(w, '.grounds');
+      eq('«На чём это основано» — пять пунктов', grounds[0].children.length, 5);
+      eq('«Чего мы не утверждаем» — три пункта', grounds[1].children.length, 3);
+      check('сказано, что снижение тревожности не заявляется',
+            /не заявляем, что карточки снижают тревожность/.test(words(grounds[1])));
+      check('блок «чего не утверждаем» не мельче остального текста',
+            size(w, '.grounds:last-of-type li') >= size(w, '#screen-about .about-text p') - 0.5);
+      var navTexts = qa(w, 'nav .link').map(words).join('|');
+      check('отдельного пункта «Об авторах» в навигации нет', navTexts.indexOf('Об авторах') < 0);
+      check('«О проекте» не обещает состояния',
+            !/станет (спокойн|легче)|успоко|расслаб|избав/i.test(words(q(w, '#screen-about'))));
+      close(w);
+    });
+
+    await scenario('Полная очистка данных', async function () {
+      seed({ mode: 'наружу' });
+      localStorage.setItem('vyiti:diary', JSON.stringify([{ at: 1, day: '2026-10-01', text: 'запись' }]));
+      var w = await open();
+      click(w, '[data-go="about"]'); await sleep(200);
+      check('подтверждение скрыто', !shown(q(w, '#wipe-confirm')));
+      click(w, '#btn-wipe'); await sleep(150);
+      check('сначала спрашивает', shown(q(w, '#wipe-confirm')));
+      click(w, '#btn-wipe-no'); await sleep(150);
+      check('«Оставить» ничего не удаляет', localStorage.getItem('vyiti:diary') !== null);
+      click(w, '#btn-wipe'); click(w, '#btn-wipe-yes'); await sleep(250);
+      var left = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i).indexOf('vyiti:') === 0) left.push(localStorage.key(i));
+      }
+      eq('после «Удалить» ничего не осталось', left, []);
+      eq('сайт возвращается на старт', screenName(w), 'start');
+      w = await reload(w);
+      eq('после перезагрузки снова приветствие', screenName(w), 'intro');
+      close(w);
+    });
+
+    await scenario('Широкий экран', async function () {
+      seed({ mode: 'наружу', level: 2 });
+      var w = await open(1280, 900);
+      darkEvening(w);
+      await take(w);
+      await done(w);
+      var wrap = q(w, '#screen-back .wrap').getBoundingClientRect();
+      check('колонка не шире 640 px', wrap.width <= 640, Math.round(wrap.width) + ' px');
+      var body = q(w, '.back-body').getBoundingClientRect();
+      var top = body.top, bottom = w.innerHeight - body.bottom;
+      check('блок не прижат к верхнему краю', top >= 100, 'сверху ' + Math.round(top) + ' px');
+      check('и стоит ближе к середине', Math.abs(top - bottom) <= 90,
+            'сверху ' + Math.round(top) + ', снизу ' + Math.round(bottom));
+      check('навигация мельче задания', size(w, '#screen-back .link') < 24);
+      close(w);
+    });
+
+    await scenario('Чего на сайте быть не должно', async function () {
+      seed({ mode: 'наружу', level: 2 });
+      var w = await open();
+      darkEvening(w);
+      for (var i = 0; i < 5; i++) {
+        await take(w); await done(w);
+        click(w, '[data-go="start"]'); await sleep(150);
+      }
+      var all = everyScreenText(w).toLowerCase();
+      var found = BANNED.filter(function (b) {
+        return all.split(/[^a-zа-яё]+/).some(function (t) { return t.indexOf(b) === 0; });
+      });
+      eq('запрещённые слова на любом экране после пяти карточек', found, []);
+      check('счётчика выполненного нигде нет',
+            !/выполнено\s*\d|выполнено карточ|сегодня уже|\d+\s*из\s*\d+|\d+\s*карточ/i.test(all.replace(/\d{4}/g, '')));
+      check('восклицательных знаков нет', all.indexOf('!') < 0);
+      check('«давай» нет', !/давай/.test(all));
+      eq('нет элементов прогресса', qa(w, 'progress, meter, [role="progressbar"]').length, 0);
+      eq('нет картинок и холстов', qa(w, 'img, svg, canvas, video, audio').length, 0);
+      var keys = [];
+      for (var k = 0; k < localStorage.length; k++) keys.push(localStorage.key(k));
+      var allowed = ['vyiti:state', 'vyiti:seen', 'vyiti:diary', 'vyiti:weather'];
+      eq('в хранилище нет ничего, кроме своих четырёх ключей',
+         keys.filter(function (x) { return allowed.indexOf(x) < 0; }), []);
+      var state = JSON.parse(localStorage.getItem('vyiti:state'));
+      check('в состоянии нет серий и очков',
+            !('streak' in state) && !('score' in state) && !('count' in state) && !('points' in state));
+      check('число сессий нигде не показано', !/сесси/i.test(all));
+      close(w);
+    });
+
+    await scenario('Доступность', async function () {
+      seed({ mode: 'наружу', level: 2 });
+      var w = await open();
+      check('язык документа — русский', w.document.documentElement.lang === 'ru');
+      var unnamed = qa(w, 'button').filter(function (b) {
+        return !(b.getAttribute('aria-label') || b.textContent).trim();
+      });
+      eq('у каждой кнопки есть имя', unnamed.length, 0);
+      eq('один заголовок первого уровня', qa(w, 'h1').length, 1);
+      eq('«перейти к содержанию» есть', qa(w, 'a.skip-link[href="#main"]').length, 1);
+      var tiny = [];
+      qa(w, '.screen').forEach(function (s) {
+        var was = s.hidden;
+        s.hidden = false;
+        qa(s, 'button, input, textarea, summary').forEach(function (el) {
+          var r = el.getBoundingClientRect();
+          if (r.height > 0 && r.height < 56) tiny.push(s.dataset.screen + ': ' + (words(el) || el.id));
+        });
+        s.hidden = was;
+      });
+      eq('все нажимаемые элементы не ниже 56 px', tiny, []);
+      var groups = qa(w, '[role="group"]').filter(function (g) { return g.getAttribute('aria-labelledby'); });
+      check('группы выбора подписаны', groups.length >= 3);
+      /* переключатели: режим, уровень, возраст, тема. Кнопки выбора города — действия,
+         состояния у них нет и быть не должно. */
+      var toggles = qa(w, '#mode-list .option, #level-list .option, #age-list .option, ' +
+                          '#age-adult .option, #theme-list .option');
+      check('у каждого переключателя есть состояние aria-pressed',
+            toggles.length === 16 && toggles.every(function (o) { return o.hasAttribute('aria-pressed'); }),
+            toggles.length + ' переключателей');
+      await take(w);
+      check('на карточке фокус у задания', w.document.activeElement.id === 'card-text');
+      close(w);
+    });
+
+    await scenario('Установка и офлайн', async function () {
+      var m = await fetch('../manifest.webmanifest');
+      check('манифест отдаётся', m.ok);
+      var manifest = await m.json();
+      eq('название', manifest.name, 'Выйти из комнаты');
+      eq('режим показа', manifest.display, 'standalone');
+      for (var i = 0; i < manifest.icons.length; i++) {
+        var r = await fetch('../' + manifest.icons[i].src);
+        check('иконка ' + manifest.icons[i].src, r.ok);
+      }
+      var sw = await fetch('../sw.js');
+      check('service worker отдаётся', sw.ok);
+      var cards = await fetch('../cards.js');
+      check('колода отдаётся', cards.ok);
+    });
+
+    var h = document.createElement('p');
+    h.innerHTML = failures === 0
+      ? '<strong class="ok">Всё сходится.</strong>'
+      : '<strong class="no">Расхождений: ' + failures + '.</strong>';
+    out.insertBefore(h, out.firstChild);
+    Report.publish('#out');
+  }
+
+  run().catch(function (e) {
+    failures++;
+    section('Сбой прогона');
+    row('прогон оборвался', 'no', String(e && e.stack || e));
+    Report.publish('#out');
+  });
+})();
+</script>
+</body>
+</html>

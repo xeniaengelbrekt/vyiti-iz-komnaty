@@ -42,7 +42,8 @@
     place: null,      // {lat, lon, name, source: 'geo' | 'city'}
     sessions: 0,
     lastDay: null,
-    recent: []        // три последние выдачи: звуковая карточка или нет
+    recent: [],       // три последние выдачи: звуковая карточка или нет
+    introSeen: false  // приветствие показывают один раз, потом оно открывается ссылкой
   };
 
   function state() {

@@ -31,6 +31,7 @@
 <script src="../js/weather.js"></script>
 <script src="../js/store.js"></script>
 <script src="../js/deck.js"></script>
+<script src="../tests/report.js"></script>
 <script>
 /* Если сайт успел поставить service worker, он отдаёт файлы из кэша, и проверять
    было бы нечего. Снимаем его и перезагружаемся: кэш соберётся заново при следующем
@@ -86,21 +87,21 @@ if ('serviceWorker' in navigator) {
 
   /* ——— колода ——— */
   section('Колода');
-  check('всего карт', K.length, 189);
+  check('всего карт', K.length, 197);
   check('наружу', count(function (c) { return c.mode === 'наружу'; }), 68);
   check('читать место', count(function (c) { return c.mode === 'читать-место'; }), 40);
-  check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 44);
+  check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 52);
   check('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 20);
   check('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 17);
   check('набор Петербурга', count(function (c) { return c.cityPack === 'спб'; }), 7);
   check('набор Москвы', count(function (c) { return c.cityPack === 'мск'; }), 7);
-  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 189);
+  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 197);
   check('у каждой карты есть текст и оборот',
-        count(function (c) { return c.text && c.back; }), 189);
+        count(function (c) { return c.text && c.back; }), 197);
   check('у всех «наружу» есть уровень',
         count(function (c) { return c.mode === 'наружу' && c.level; }), 68);
   check('у всех «совместное внимание» есть возраст',
-        count(function (c) { return c.mode === 'совместное-внимание' && c.age; }), 44);
+        count(function (c) { return c.mode === 'совместное-внимание' && c.age; }), 52);
   check('у всех «совместное внимание» есть «если не пошло»',
         count(function (c) { return c.mode === 'совместное-внимание' && c.fallback; }), 44);
   check('уровни «наружу»', [1, 2, 3].map(function (l) {
@@ -498,6 +499,7 @@ if ('serviceWorker' in navigator) {
       ? '<p class="ok"><strong>Всё сходится.</strong></p>'
       : '<p class="no"><strong>Расхождений: ' + failures + '.</strong></p>';
     document.getElementById('out').innerHTML = head + html.join('');
+    if (window.Report) Report.publish('#out');   // для tests/run_tests.py
   }
 })();
 </script>

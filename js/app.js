@@ -37,7 +37,7 @@
   /* ————— экраны ————— */
 
   function show(name) {
-    if (name !== 'archive' && name !== 'about') previousScreen = name;
+    if (name !== 'archive' && name !== 'about' && name !== 'intro') previousScreen = name;
     activeScreen = name;
     var list = document.querySelectorAll('.screen');
     for (var i = 0; i < list.length; i++) {
@@ -343,6 +343,12 @@
   function bind() {
     document.addEventListener('click', onClick);
 
+    $('btn-intro-ok').addEventListener('click', function () {
+      Store.patch({ introSeen: true });
+      renderStart();
+      show('start');
+    });
+
     $('btn-take').addEventListener('click', function () { take(true); });
     $('btn-done').addEventListener('click', done);
     $('btn-another').addEventListener('click', another);
@@ -402,6 +408,7 @@
     renderStart();
     bind();
     loadWeather();
+    if (!Store.state().introSeen) show('intro');
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
       navigator.serviceWorker.register('sw.js').catch(function () { /* не критично */ });
     }

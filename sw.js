@@ -2,7 +2,7 @@
    открывался без сети. Запросы погоды не кэшируются и в офлайне просто
    не проходят — отбор тогда идёт по свету и сезону. */
 
-var CACHE = 'vyiti-6';
+var CACHE = 'vyiti-7';
 var SHELL = [
   './',
   'index.html',
@@ -39,8 +39,8 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
-  /* Страница самопроверки должна показывать текущую сборку, а не вчерашнюю. */
-  if (url.pathname.indexOf('/tools/') >= 0) return;
+  /* Страницы самопроверки и тестов должны показывать текущую сборку, а не вчерашнюю. */
+  if (url.pathname.indexOf('/tools/') >= 0 || url.pathname.indexOf('/tests/') >= 0) return;
 
   /* Отдаём из кэша сразу — на улице связь бывает никакая, — а следом
      тихо обновляем кэш. Обновлённая версия доедет со следующим открытием. */

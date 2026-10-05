@@ -188,3 +188,6 @@ print("шаги «читать место»:", dict(collections.Counter(
 print("проблем:", len(problems))
 for p in problems:
     print("  ", p)
+
+# ненулевой код нужен тестам и любой автоматической сборке
+sys.exit(1 if problems else 0)
