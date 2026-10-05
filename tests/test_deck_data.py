@@ -343,12 +343,49 @@ class Environment(unittest.TestCase):
                for m in [rx.search(c["text"])] if m]
         self.assertEqual(bad, [])
 
-    def test_night_nature_cards_are_done_standing_still(self):
-        # в тёмном лесу не предлагаем ходить: ночные карточки природы выполняются на месте
-        rx = re.compile(r"не сходя с места|стоите|стоя|над головой", re.IGNORECASE)
+    def test_dusk_and_night_nature_cards_are_done_standing_still(self):
+        # в сумерках и в тёмном лесу не предлагаем ходить: такие карточки природы
+        # выполняются на месте, и это сказано в самом тексте
+        # «свет: неважно» тоже значит сумерки и темнота: такая карточка выпадает и в них
+        rx = re.compile(r"не сходя с места|стоите|над головой", re.IGNORECASE)
+        dusk_or_dark = ("темнота", "сумерки", "неважно")
         bad = [c["id"] for c in self.nature()
-               if "темнота" in c["light"] and not rx.search(c["text"])]
+               if any(l in c["light"] for l in dusk_or_dark) and not rx.search(c["text"])
+               and c["mode"] != "с-собакой"]
         self.assertEqual(bad, [])
+
+    def test_dog_cards_in_the_park_are_daytime_only(self):
+        # с собакой человек всё равно идёт, но тёмный лес карточкой не украшаем
+        bad = [c["id"] for c in self.nature() if c["mode"] == "с-собакой"
+               and any(l in c["light"] for l in ("темнота", "сумерки", "неважно"))]
+        self.assertEqual(bad, [])
+
+    def test_dusk_and_night_nature_cards_do_not_ask_to_walk(self):
+        # сумерки и темнота в парке: ничего, что требует ходить
+        rx = re.compile(r"идите|пройдите|дойдите|обойдите|подойдите|отойдите|выберите поворот|"
+                        r"проверьте по пути|сделайте .* шаг|перейдите|спуститесь|поднимитесь",
+                        re.IGNORECASE)
+        bad = [c["id"] for c in self.nature()
+               if ("сумерки" in c["light"] or "темнота" in c["light"]) and rx.search(c["text"])]
+        self.assertEqual(bad, [])
+
+    def test_plants_are_looked_at_not_touched(self):
+        # в парках и лесах бывает борщевик, а у малышей всё идёт в рот:
+        # растения не срываем и не трогаем, берём только то, что уже упало
+        rx_plant = re.compile(r"растени|лист(?!в)", re.IGNORECASE)
+        rx_ok = re.compile(r"не трогая|не срывая|упали|опавш|на земле", re.IGNORECASE)
+        bad = [c["id"] for c in self.nature()
+               if rx_plant.search(c["text"]) and not rx_ok.search(c["text"])]
+        self.assertEqual(bad, [])
+
+    def test_nothing_in_the_park_can_be_lost(self):
+        # карточку нельзя проиграть: если искомого нет, она всё равно выполнена
+        rx = re.compile(r"не нашли|нет .{0,30}карта выполнена|не слышно|не видно|достаточно|"
+                        r"если .{0,40}далеко|не получается", re.IGNORECASE)
+        risky = {"НАР-71", "НАР-77", "НАР-79", "ЧМ-32", "ЧМ-33", "ЧМ-36", "СБ-21"}
+        by_id = {c["id"]: c for c in CARDS}
+        bad = [i for i in risky if not rx.search(by_id[i]["text"] + " " + (by_id[i].get("fallback") or ""))]
+        self.assertEqual(sorted(bad), [])
 
     def test_nature_cards_that_walk_stay_on_the_path(self):
         rx = re.compile(r"тропы|по пути|по тропе", re.IGNORECASE)
