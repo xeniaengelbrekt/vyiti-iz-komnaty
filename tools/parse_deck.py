@@ -28,6 +28,9 @@ MODE_BY_PREFIX = {
 }
 CITY_BY_PREFIX = {"СПб": "спб", "МСК": "мск"}
 MODALITIES = {"зрение", "слух", "обоняние", "температура", "кросс"}
+# где работает карточка: «город» — нужна застройка (стены, окна, фонари, машины),
+# «природа» — парк или лес, «везде» — подходит и там и там (по умолчанию)
+ENVIRONMENTS = {"город", "природа", "везде"}
 ENTRY_TYPES = {"свободная", "с ограничением"}
 AGE_BY_SECTION = [
     ("2–3", "2-3"), ("4–5", "4-5"), ("6–8", "6-8"), ("9–12", "9-12"),
@@ -84,6 +87,7 @@ for b in blocks:
         "weatherNot": [],
         "modality": None,
         "criterion": None,
+        "environment": "везде",
         "needsHistory": b["id"] in NEEDS_HISTORY,
         "noHistory": b["id"] in NO_HISTORY,
         "cityPack": CITY_BY_PREFIX.get(prefix),
@@ -132,6 +136,10 @@ for b in blocks:
                 card["weather"] = split_list(value)
             elif key == "погода кроме":
                 card["weatherNot"] = split_list(value)
+            elif key == "среда":
+                if value not in ENVIRONMENTS:
+                    problems.append("%s: неизвестная среда %s" % (card["id"], value))
+                card["environment"] = value
             elif key == "слой":
                 card["layer"] = value
             elif key == "застройка":

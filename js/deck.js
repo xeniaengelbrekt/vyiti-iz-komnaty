@@ -58,6 +58,14 @@
     return has(card.seasons, 'любой') || has(card.seasons, season);
   }
 
+  /* Среда: «город» — нужна застройка (стены, окна, фонари, машины), «природа» —
+     парк или лес, «везде» — подходит и там и там. Без выбора среды не фильтруем. */
+  function envFits(card, env) {
+    if (!env) return true;
+    var e = card.environment || 'везде';
+    return e === 'везде' || e === env;
+  }
+
   function weatherFits(card, tags, relaxed) {
     if (!tags) return true;                        // погода не загрузилась
     /* Запрет сильнее разрешения: «одной температуры» неверна на солнце,
@@ -105,7 +113,8 @@
   /* Пул после жёстких фильтров: режим, свет, сезон, погода. */
   function pool(cards, o) {
     var base = cards.filter(function (c) {
-      return modeFits(c, o) && lightFits(c, o.light) && seasonFits(c, o.season);
+      return modeFits(c, o) && envFits(c, o.environment) &&
+             lightFits(c, o.light) && seasonFits(c, o.season);
     });
     var strict = base.filter(function (c) { return weatherFits(c, o.weather, false); });
     if (strict.length >= MIN_POOL || !o.weather) return strict;

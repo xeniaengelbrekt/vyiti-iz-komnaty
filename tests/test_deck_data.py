@@ -20,6 +20,26 @@ SEASONS = {"любой", "зима", "весна", "лето", "осень"}
 WEATHER = {"ясно", "облачно", "сухо", "дождь", "снег", "после-дождя", "мороз",
            "оттепель", "свежий-снег", "наст", "ветер", "туман", "неважно"}
 MODALITY = {"зрение", "слух", "обоняние", "температура", "кросс", None}
+ENVIRONMENTS = {"город", "природа", "везде"}
+ENVS = ("город", "природа")      # то, что выбирает человек
+
+# слова, по которым видно, что карточке нужна застройка
+URBAN = re.compile(
+    r"здани|фасад|подъезд|двор|арк[аиуе]\b|арку|асфальт|машин|вывеск|крыш|кладк|улиц|тротуар|"
+    r"балкон|гараж|витрин|кирпич|проём|штукатур|бордюр|подвал|цоколь|лестниц|квартал|"
+    r"табличк|провод|фонар|окн[аоуе]|окон|\bдом[аеу]?\b|\bдомов|\bдомом\b|стен[аыуе]\b|стену|"
+    r"столб|магазин|светофор|перекр[её]ст|этаж|капот|шлагбаум|забор|вентиляц|люк[аиоуе]?\b",
+    re.IGNORECASE)
+
+# «везде»-карточки, в которых такие слова встречаются, но застройка не нужна:
+# разобраны вручную, по одной
+URBAN_WORD_BUT_ANYWHERE = {
+    "НАР-12": "три отражения: не в зеркале и не в витрине — подойдёт лужа",
+    "НАР-26": "«проверить можно дома» — это не здание",
+    "НАР-56": "ветки, вода, люди, машины — хватит веток и воды",
+    "СВ-08": "окна, машины, камешки, ступени — подойдут камешки",
+    "СВ-64": "светлое пятно на земле или на стене",
+}
 
 # Меньше стольких карточек в любом сочетании «ступень × свет × сезон» — провал.
 # Три — это минимум, при котором семидневное правило не сводит выдачу к одной и той же.
@@ -49,12 +69,16 @@ def fits(card, light, season):
     return light_ok and season_ok
 
 
-def pool(key, light, season, city=None):
+def env_fits(card, env):
+    return env is None or card["environment"] in ("везде", env)
+
+
+def pool(key, light, season, city=None, env="город"):
     out = []
     for c in groups()[key]:
         if c.get("cityPack") and c["cityPack"] != city:
             continue
-        if fits(c, light, season):
+        if env_fits(c, env) and fits(c, light, season):
             out.append(c)
     return out
 
@@ -98,6 +122,16 @@ class Integrity(unittest.TestCase):
             if c["modality"] not in MODALITY:
                 errors.append((c["id"], "модальность", c["modality"]))
         self.assertEqual(errors, [])
+
+    def test_environment_values_known(self):
+        self.assertEqual({c["environment"] for c in CARDS} - ENVIRONMENTS, set())
+
+    def test_every_environment_is_used(self):
+        self.assertEqual({c["environment"] for c in CARDS}, ENVIRONMENTS)
+
+    def test_city_pack_cards_need_a_city(self):
+        self.assertEqual([c["id"] for c in CARDS
+                          if c["cityPack"] and c["environment"] != "город"], [])
 
     def test_level_only_where_it_belongs(self):
         for c in of("наружу"):
@@ -257,6 +291,78 @@ class Policy(unittest.TestCase):
                           if re.search(r"отвлеч|отвлек", c.get("fallback") or "", re.I)], [])
 
 
+class Environment(unittest.TestCase):
+    """Выбор среды «двор или город» / «парк или лес»."""
+
+    def nature(self):
+        return [c for c in CARDS if c["environment"] == "природа"]
+
+    def test_nature_cards_exist_in_every_mode_that_needs_them(self):
+        modes = {c["mode"] for c in self.nature()}
+        self.assertTrue({"наружу", "читать-место", "совместное-внимание", "с-собакой"} <= modes, modes)
+
+    def test_nature_cards_never_mention_buildings(self):
+        bad = [c["id"] for c in self.nature() if URBAN.search(c["text"] + " " + c["title"])]
+        self.assertEqual(bad, [])
+
+    def test_anywhere_cards_do_not_need_buildings(self):
+        # если в тексте «везде»-карточки появилось слово про застройку — либо ей нужна
+        # среда «город», либо исключение надо разобрать и записать в URBAN_WORD_BUT_ANYWHERE
+        bad = [c["id"] for c in CARDS
+               if c["environment"] == "везде" and URBAN.search(c["text"] + " " + c["title"])
+               and c["id"] not in URBAN_WORD_BUT_ANYWHERE]
+        self.assertEqual(bad, [])
+
+    def test_exceptions_are_still_exceptions(self):
+        # исключение, которое больше не нужно, надо убрать: список не должен копить мусор
+        by_id = {c["id"]: c for c in CARDS}
+        stale = [i for i in URBAN_WORD_BUT_ANYWHERE
+                 if i not in by_id or by_id[i]["environment"] != "везде"
+                 or not URBAN.search(by_id[i]["text"] + " " + by_id[i]["title"])]
+        self.assertEqual(stale, [])
+
+    def test_city_cards_mention_buildings_or_were_checked_by_hand(self):
+        # городская карточка без единого «городского» слова — повод перечитать,
+        # нужна ли ей застройка. Эти разобраны вручную.
+        hand_checked = {"НАР-07", "НАР-17", "НАР-18", "НАР-25", "НАР-27", "НАР-50", "НАР-54",
+                        "НАР-68", "ЧМ-06", "ЧМ-18", "ЧМ-23", "ЧМ-26", "ПД-09", "СВ-21", "СВ-26",
+                        "СВ-35", "СВ-40", "СВ-44"}
+        bad = [c["id"] for c in CARDS
+               if c["environment"] == "город" and not URBAN.search(c["text"] + " " + c["title"])
+               and c["id"] not in hand_checked]
+        self.assertEqual(bad, [])
+
+    def test_nature_cards_are_safe(self):
+        # ничего не трогать и не пробовать, не сходить с тропы, не подходить к воде
+        # и льду, не лезть на деревья: проект никуда не отправляет и ничем не рискует
+        rx = re.compile(
+            r"на вкус|съешьте|попробуйте (на|съесть)|сорвите|ягод|гриб|залезьте|заберитесь|"
+            r"сойдите с тропы|сверните с тропы|по льду|у воды|у берега|к воде|"
+            r"прыгните|костёр|разведите", re.IGNORECASE)
+        bad = [(c["id"], m.group(0)) for c in CARDS
+               for m in [rx.search(c["text"])] if m]
+        self.assertEqual(bad, [])
+
+    def test_night_nature_cards_are_done_standing_still(self):
+        # в тёмном лесу не предлагаем ходить: ночные карточки природы выполняются на месте
+        rx = re.compile(r"не сходя с места|стоите|стоя|над головой", re.IGNORECASE)
+        bad = [c["id"] for c in self.nature()
+               if "темнота" in c["light"] and not rx.search(c["text"])]
+        self.assertEqual(bad, [])
+
+    def test_nature_cards_that_walk_stay_on_the_path(self):
+        rx = re.compile(r"тропы|по пути|по тропе", re.IGNORECASE)
+        bad = [c["id"] for c in self.nature()
+               if re.search(r"проверьте по пути|дойдите|пройдите", c["text"], re.I)
+               and not rx.search(c["text"])]
+        self.assertEqual(bad, [])
+
+    def test_each_environment_has_every_mode(self):
+        for env in ENVS:
+            for key in groups():
+                self.assertTrue(pool(key, "день", "лето", env=env), (env, key))
+
+
 class Coverage(unittest.TestCase):
     """Пул не должен пустеть там, где человек бывает чаще всего."""
 
@@ -300,22 +406,42 @@ class Coverage(unittest.TestCase):
         self.assertEqual(empty, [])
 
     def test_no_pool_is_thinner_than_the_minimum(self):
-        # любая ступень в любой свет и сезон: от темноты до низкого солнца, которое
-        # зимой в Петербурге — это весь световой день (солнце не выше 6,6°)
+        # любая ступень в любой свет и сезон, в обеих средах: от темноты до низкого
+        # солнца, которое зимой в Петербурге — это весь световой день (не выше 6,6°)
         thin = []
-        for key in groups():
-            for light in ("день", "низкое-солнце", "сумерки", "темнота"):
-                for season in ("зима", "весна", "лето", "осень"):
-                    n = len(pool(key, light, season, city=None))
-                    if n < MIN_POOL:
-                        thin.append((key, light, season, n))
+        for env in ENVS:
+            for key in groups():
+                for light in ("день", "низкое-солнце", "сумерки", "темнота"):
+                    for season in ("зима", "весна", "лето", "осень"):
+                        n = len(pool(key, light, season, city=None, env=env))
+                        if n < MIN_POOL:
+                            thin.append((env, key, light, season, n))
         self.assertEqual(thin, [])
 
     def test_dark_evening_pools_have_room_to_vary(self):
-        # ноябрьский вечер: ступени не должны сводиться к трём-четырём карточкам
-        small = {key: min(len(pool(key, "темнота", s, city=None)) for s in ("осень", "зима"))
-                 for key in groups()}
-        self.assertEqual({k: n for k, n in small.items() if n < 4}, {})
+        # ноябрьский вечер: ступени не должны сводиться к двум-трём карточкам
+        small = {}
+        for env in ENVS:
+            for key in groups():
+                n = min(len(pool(key, "темнота", s, city=None, env=env)) for s in ("осень", "зима"))
+                if n < 3:
+                    small[(env, key)] = n
+        self.assertEqual(small, {})
+
+    def test_city_has_no_pool_below_four(self):
+        # город — основная среда: там запас больше
+        thin = [(key, light, season)
+                for key in groups()
+                for light in ("день", "низкое-солнце", "сумерки", "темнота")
+                for season in ("зима", "весна", "лето", "осень")
+                if len(pool(key, light, season, city="спб", env="город")) < 4]
+        self.assertEqual(thin, [])
+
+    def test_read_place_has_its_own_material_in_the_park(self):
+        # раньше у «Читать место» в парке не было ни одной карты на сумерки и темноту
+        mode = ("читать-место", None)
+        for light in ("день", "низкое-солнце", "сумерки", "темнота"):
+            self.assertGreaterEqual(len(pool(mode, light, "осень", env="природа")), 3, light)
 
     def test_history_cards_do_not_starve_a_pool(self):
         # новичок не видит needsHistory; пул без них не должен пустеть

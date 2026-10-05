@@ -38,7 +38,8 @@
 
     <h3 class="section-title">Как пользоваться</h3>
     <ol class="steps">
-      <li><strong>Выберите режим.</strong> Не знаете, какой, — возьмите «Наружу».</li>
+      <li><strong>Выберите, где вы гуляете:</strong> во дворе и на улице или в парке и лесу.
+        Потом режим; не знаете, какой, — возьмите «Наружу».</li>
       <li><strong>Возьмите карточку</strong> и выйдите на прогулку. Задание одно,
         на экране больше ничего нет.</li>
       <li><strong>Выполните его:</strong> найти, посчитать, предсказать. Не подходит —
@@ -72,6 +73,12 @@
     <p class="lead muted">Никуда ехать не надо. Всё, что нужно, есть во дворе, где вы ходите
       каждый день, — просто вы на это не смотрели.</p>
 
+    <h2 class="section-title" id="env-title">Где вы гуляете</h2>
+    <div class="options options-row" role="group" aria-labelledby="env-title" id="env-list">
+      <button type="button" class="option option-small" data-env="город"><span class="option-name">Двор или город</span></button>
+      <button type="button" class="option option-small" data-env="природа"><span class="option-name">Парк или лес</span></button>
+    </div>
+
     <h2 class="section-title" id="mode-title">Режим</h2>
     <div class="options" role="group" aria-labelledby="mode-title" id="mode-list">
       <button type="button" class="option" data-mode="наружу">
@@ -91,7 +98,7 @@
       </button>
       <button type="button" class="option" data-mode="с-собакой">
         <span class="option-name">С собакой</span>
-        <span class="option-note">занять те десять минут, пока она нюхает столб</span>
+        <span class="option-note">замечать то, что замечает она</span>
         <span class="option-sub">задание помещается в паузу, которую она и так делает</span>
       </button>
       <button type="button" class="option" data-mode="полевой-дневник">
@@ -137,13 +144,13 @@
     </div>
 
     <div class="place">
-      <h2 class="section-title">Место</h2>
+      <h2 class="section-title">Свет и погода</h2>
       <div class="place-set">
-        <p class="muted small" id="place-state">Без места сайт работает, но различает только время года.</p>
+        <p class="muted small" id="place-state">Чтобы подобрать задание по свету и погоде, сайту нужно знать, где вы. Без этого он различает только время года.</p>
         <button type="button" class="link" id="btn-place-change" hidden>изменить</button>
       </div>
       <div class="place-actions" id="place-actions">
-        <button type="button" class="btn btn-quiet" id="btn-geo">Определить</button>
+        <button type="button" class="btn btn-quiet" id="btn-geo">Определить место</button>
         <button type="button" class="btn btn-quiet" id="btn-city">Выбрать город</button>
       </div>
       <div class="city-picker" id="city-picker" hidden>
@@ -328,7 +335,7 @@
       <button type="button" class="option option-small" data-theme-set="light"><span class="option-name">Светлая</span></button>
     </div>
 
-    <h3 class="section-title">Место</h3>
+    <h3 class="section-title">Свет и погода</h3>
     <p class="small muted" id="about-place"></p>
 
     <h3 class="section-title">Данные</h3>

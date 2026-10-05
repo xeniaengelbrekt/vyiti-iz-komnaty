@@ -92,6 +92,7 @@
   function renderStart() {
     var s = Store.state();
     if (s.age === 'со-взрослым' && !HAS_ADULT) s = Store.patch({ age: '9-12' });
+    mark('env-list', 'env', s.environment);
     mark('mode-list', 'mode', s.mode);
     mark('level-list', 'level', s.level);
     mark('age-list', 'age', s.age);
@@ -105,7 +106,7 @@
 
   function placeText() {
     var p = Store.state().place;
-    if (!p) return 'Без места сайт работает, но различает только время года.';
+    if (!p) return 'Чтобы подобрать задание по свету и погоде, сайту нужно знать, где вы. Без этого он различает только время года.';
     if (p.name) return 'Место: ' + p.name + '.';
     return 'Место определено по координатам.';
   }
@@ -151,6 +152,7 @@
       level: s.level,
       age: s.age,
       place: s.place,
+      environment: s.environment,
       light: Sun.category(now, s.place),
       season: Sun.season(now),
       weather: weatherTags,
@@ -307,9 +309,14 @@
   /* ————— события ————— */
 
   function onClick(e) {
-    var el = e.target.closest ? e.target.closest('[data-mode],[data-level],[data-age],[data-city],[data-theme-set],[data-go]') : null;
+    var el = e.target.closest ? e.target.closest('[data-env],[data-mode],[data-level],[data-age],[data-city],[data-theme-set],[data-go]') : null;
     if (!el) return;
 
+    if (el.dataset.env) {
+      Store.patch({ environment: el.dataset.env });
+      renderStart();
+      return;
+    }
     if (el.dataset.mode) {
       Store.patch({ mode: el.dataset.mode });
       renderStart();

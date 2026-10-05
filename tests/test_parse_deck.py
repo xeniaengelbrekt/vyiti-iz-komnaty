@@ -42,8 +42,8 @@ class ParseGoodFixture(unittest.TestCase):
         self.assertEqual(self.code, 0, self.out)
         self.assertIn("проблем: 0", self.out)
 
-    def test_all_seven_cards_found(self):
-        self.assertEqual(len(self.cards), 7, sorted(self.cards))
+    def test_all_nine_cards_found(self):
+        self.assertEqual(len(self.cards), 9, sorted(self.cards))
 
     def test_modes_by_prefix(self):
         modes = {i: c["mode"] for i, c in self.cards.items()}
@@ -62,6 +62,16 @@ class ParseGoodFixture(unittest.TestCase):
         self.assertEqual(c["criterion"], "два пятна")
         self.assertEqual(c["text"], "Найдите красное пятно и синее. Что из них ярче?")
         self.assertEqual(c["back"], "Объяснение первой пробы.")
+
+    def test_environment_tag(self):
+        self.assertEqual(self.cards["НАР-02"]["environment"], "город")
+        self.assertEqual(self.cards["НАР-03"]["environment"], "природа")
+
+    def test_environment_defaults_to_anywhere(self):
+        # без тега карточка подходит и городу, и природе
+        self.assertEqual(self.cards["НАР-01"]["environment"], "везде")
+        self.assertEqual(self.cards["ПД-08а"]["environment"], "везде")
+        self.assertEqual(self.cards["СВ-01"]["environment"], "везде")
 
     def test_weather_exclusion_tag(self):
         self.assertEqual(self.cards["НАР-01"]["weatherNot"], ["ясно"])
@@ -122,6 +132,9 @@ class ParseBadFixture(unittest.TestCase):
 
     def test_missing_light_is_reported(self):
         self.assertIn("нет тега света", self.out)
+
+    def test_unknown_environment_is_reported(self):
+        self.assertIn("неизвестная среда космос", self.out)
 
     def test_duplicate_id_is_reported(self):
         self.assertIn("дубликаты id", self.out)

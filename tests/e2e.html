@@ -169,6 +169,37 @@
     }
   }
 
+  var CONFIGS = [
+    ['Наружу, уровень 1', { mode: 'наружу', level: 1 }],
+    ['Наружу, уровень 2', { mode: 'наружу', level: 2 }],
+    ['Наружу, уровень 3', { mode: 'наружу', level: 3 }],
+    ['Читать место', { mode: 'читать-место' }],
+    ['Совместное внимание, 2–3', { mode: 'совместное-внимание', age: '2-3' }],
+    ['Совместное внимание, 4–5', { mode: 'совместное-внимание', age: '4-5' }],
+    ['Совместное внимание, 6–8', { mode: 'совместное-внимание', age: '6-8' }],
+    ['Совместное внимание, 9–12', { mode: 'совместное-внимание', age: '9-12' }],
+    ['Совместное внимание, со взрослым', { mode: 'совместное-внимание', age: 'со-взрослым' }],
+    ['С собакой', { mode: 'с-собакой' }],
+    ['Полевой дневник', { mode: 'полевой-дневник' }]
+  ];
+
+  /* n карточек подряд через «Другую»: сами карточки, а не их тексты */
+  async function collect(w, n) {
+    var out = [];
+    await take(w);
+    for (var i = 0; i < n; i++) {
+      if (screenName(w) !== 'card' || !shown(q(w, '#btn-done'))) { out.push(null); break; }
+      out.push(cardNow(w));
+      await another(w);
+    }
+    return out;
+  }
+
+  function stub(w, light, season) {
+    w.Sun.category = function () { return light; };
+    w.Sun.season = function () { return season; };
+  }
+
   var BANNED = ['балл', 'очк', 'достижен', 'рейтинг', 'streak', 'поздрав', 'молодец',
                 'уведомл', 'напомин', 'подписк', 'регистрац', 'прогресс', 'отлично', 'супер'];
 
@@ -195,6 +226,7 @@
       check('заголовок в фокусе', w.document.activeElement.id === 'intro-title');
       var t = words(q(w, '#screen-intro'));
       check('рассказывает, для чего проект', /тренировка внимания/.test(t) && /Никуда ехать/.test(t));
+      check('первым шагом просит выбрать, где вы гуляете', /где вы гуляете/.test(t) && /парке и лесу/.test(t));
       eq('пять шагов «как пользоваться»', qa(w, '#screen-intro .steps li').length, 5);
       check('объясняет, зачем оборот скрыт до «Готово»', /скрыто нарочно/.test(t));
       check('объясняет, зачем нужно место', /определить место/.test(t) && /свет и погоду/.test(t));
@@ -237,6 +269,17 @@
               return parseFloat(w.getComputedStyle(sub).fontSize) < parseFloat(w.getComputedStyle(note).fontSize) &&
                      w.getComputedStyle(sub).color !== w.getComputedStyle(note).color;
             }));
+      eq('выбор среды', qa(w, '#env-list .option').map(function (o) { return plain(q(o, '.option-name')); }),
+         ['Двор или город', 'Парк или лес']);
+      check('по умолчанию выбран «Двор или город»',
+            q(w, '[data-env="город"]').getAttribute('aria-pressed') === 'true' &&
+            q(w, '[data-env="природа"]').getAttribute('aria-pressed') === 'false');
+      check('выбор среды стоит выше режимов', !!(q(w, '#env-list').compareDocumentPosition(q(w, '#mode-list')) & 4));
+      eq('подпись режима «С собакой» мягкая', plain(q(w, '[data-mode="с-собакой"] .option-note')),
+         'замечать то, что замечает она');
+      check('«нюхает столб» на сайте нет', !/нюхает столб/.test(plain(q(w, '#screen-start'))));
+      eq('блок про место называется «Свет и погода»', plain(q(w, '.place .section-title')), 'Свет и погода');
+      eq('кнопка «Определить место»', plain(q(w, '#btn-geo')), 'Определить место');
       check('фразы «если трудно выйти» на главном экране нет',
             !/если трудно выйти/i.test(words(q(w, '#screen-start'))));
       check('режим не выбран — главная кнопка выключена', q(w, '#btn-take').disabled);
@@ -526,35 +569,64 @@
       }
     });
 
-    await scenario('Тёмный осенний вечер: ни одна ступень не пустеет', async function () {
-      var configs = [
-        ['Наружу, уровень 1', { mode: 'наружу', level: 1 }],
-        ['Наружу, уровень 2', { mode: 'наружу', level: 2 }],
-        ['Наружу, уровень 3', { mode: 'наружу', level: 3 }],
-        ['Читать место', { mode: 'читать-место' }],
-        ['Совместное внимание, 2–3', { mode: 'совместное-внимание', age: '2-3' }],
-        ['Совместное внимание, 4–5', { mode: 'совместное-внимание', age: '4-5' }],
-        ['Совместное внимание, 6–8', { mode: 'совместное-внимание', age: '6-8' }],
-        ['Совместное внимание, 9–12', { mode: 'совместное-внимание', age: '9-12' }],
-        ['Совместное внимание, со взрослым', { mode: 'совместное-внимание', age: 'со-взрослым' }],
-        ['С собакой', { mode: 'с-собакой' }],
-        ['Полевой дневник', { mode: 'полевой-дневник' }]
-      ];
-      for (var i = 0; i < configs.length; i++) {
-        seed(configs[i][1], { weather: ['облачно', 'сухо', 'мороз'] });
-        var w = await open();
-        darkEvening(w);
-        await take(w);
-        var texts = {}, empty = 0;
-        for (var n = 0; n < 8; n++) {
-          if (screenName(w) !== 'card' || !shown(q(w, '#btn-done'))) { empty++; break; }
-          texts[q(w, '#card-text').textContent] = true;
-          await another(w);
+    await scenario('Среда: двор или город, парк или лес', async function () {
+      // по умолчанию — город; выбор делается одним нажатием и переживает перезагрузку
+      seed({});
+      var w = await open();
+      click(w, '[data-env="природа"]'); await sleep(120);
+      check('нажатие сразу меняет выбор',
+            q(w, '[data-env="природа"]').getAttribute('aria-pressed') === 'true' &&
+            q(w, '[data-env="город"]').getAttribute('aria-pressed') === 'false');
+      eq('выбор сохранён', JSON.parse(localStorage.getItem('vyiti:state')).environment, 'природа');
+      w = await reload(w);
+      check('и переживает перезагрузку', q(w, '[data-env="природа"]').getAttribute('aria-pressed') === 'true');
+      click(w, '[data-mode="читать-место"]');
+      stub(w, 'день', 'лето');
+      var cards = await collect(w, 12);
+      check('в парке «Читать место» отдаёт карточки', cards.length === 12 && cards.every(Boolean));
+      eq('и ни одной про застройку',
+         cards.filter(function (c) { return c && c.environment === 'город'; }).length, 0);
+      eq('ни одной из городских наборов', cards.filter(function (c) { return c && c.cityPack; }).length, 0);
+      check('и они разные', Object.keys(cards.reduce(function (m, c) { if (c) m[c.id] = 1; return m; }, {})).length >= 3);
+      close(w);
+
+      // в городе — наоборот
+      seed({ mode: 'читать-место', environment: 'город' });
+      var c = await open();
+      stub(c, 'день', 'лето');
+      var city = await collect(c, 12);
+      eq('в городе нет карточек про парк и лес',
+         city.filter(function (x) { return x && x.environment === 'природа'; }).length, 0);
+      close(c);
+
+      // у «Наружу» в парке — уровни по-прежнему не смешиваются
+      seed({ mode: 'наружу', level: 2, environment: 'природа' });
+      var o = await open();
+      stub(o, 'день', 'весна');
+      var out = await collect(o, 10);
+      check('«Наружу» в парке: только второй уровень и только не городские',
+            out.every(function (x) { return x && x.level === 2 && x.environment !== 'город'; }));
+      close(o);
+    });
+
+    await scenario('Тёмный осенний вечер: ни одна ступень не пустеет — в обеих средах', async function () {
+      var envs = ['город', 'природа'];
+      for (var e = 0; e < envs.length; e++) {
+        for (var i = 0; i < CONFIGS.length; i++) {
+          var st = { environment: envs[e] };
+          for (var k in CONFIGS[i][1]) st[k] = CONFIGS[i][1][k];
+          seed(st, { weather: ['облачно', 'сухо', 'мороз'] });
+          var w = await open();
+          darkEvening(w);
+          var got = await collect(w, 8);
+          var texts = {}, empty = 0;
+          got.forEach(function (c) { if (!c) empty++; else texts[c.id] = true; });
+          var label = '«' + envs[e] + '»: ' + CONFIGS[i][0];
+          check(label + ' — карточка выдаётся каждый раз', empty === 0);
+          var distinct = Object.keys(texts).length;
+          check(label + ' — в тёмный вечер больше двух разных', distinct >= 3, distinct + ' разных');
+          close(w);
         }
-        var distinct = Object.keys(texts).length;
-        check(configs[i][0] + ': карточка выдаётся каждый раз', empty === 0);
-        check(configs[i][0] + ': в тёмный вечер больше двух разных', distinct >= 3, distinct + ' разных');
-        close(w);
       }
     });
 
@@ -591,6 +663,8 @@
         value: { getCurrentPosition: function (ok, fail) { fail({ code: 1 }); } }
       });
       check('место не выбрано: выбор города скрыт', !shown(q(g, '#city-picker')));
+      check('без места блок объясняет, зачем сайту знать, где вы',
+            /по свету и погоде/.test(words(q(g, '#place-state'))));
       click(g, '#btn-geo'); await sleep(250);
       check('после отказа предложен выбор города', shown(q(g, '#city-picker')));
       eq('в списке Москва и Петербург',
@@ -770,10 +844,10 @@
       check('группы выбора подписаны', groups.length >= 3);
       /* переключатели: режим, уровень, возраст, тема. Кнопки выбора города — действия,
          состояния у них нет и быть не должно. */
-      var toggles = qa(w, '#mode-list .option, #level-list .option, #age-list .option, ' +
-                          '#age-adult .option, #theme-list .option');
+      var toggles = qa(w, '#env-list .option, #mode-list .option, #level-list .option, ' +
+                          '#age-list .option, #age-adult .option, #theme-list .option');
       check('у каждого переключателя есть состояние aria-pressed',
-            toggles.length === 16 && toggles.every(function (o) { return o.hasAttribute('aria-pressed'); }),
+            toggles.length === 18 && toggles.every(function (o) { return o.hasAttribute('aria-pressed'); }),
             toggles.length + ' переключателей');
       await take(w);
       check('на карточке фокус у задания', w.document.activeElement.id === 'card-text');

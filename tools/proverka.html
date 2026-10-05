@@ -78,42 +78,53 @@ if ('serviceWorker' in navigator) {
   function ctx(o) {
     var base = { mode: 'наружу', level: 1, age: '4-5', place: SPB, light: 'темнота',
                  season: 'осень', weather: null, seen: {}, sessions: 9,
-                 today: '2026-11-15', exclude: [] };
+                 today: '2026-11-15', exclude: [], environment: 'город' };
     for (var k in o) base[k] = o[k];
     return base;
   }
   function ids(list) { return list.map(function (c) { return c.id; }).sort(); }
   function count(pred) { return K.filter(pred).length; }
 
-  /* ——— колода ——— */
+  /* ——— колода ———
+     Размеры проверяются снизу: потеря карточек — провал, а новая партия — нет. */
+  function atLeast(name, got, min) {
+    check(got >= min ? name : name + ' (' + got + ' — меньше ' + min + ')', got >= min, true);
+  }
   section('Колода');
-  check('всего карт', K.length, 211);
-  check('наружу', count(function (c) { return c.mode === 'наружу'; }), 68);
-  check('читать место', count(function (c) { return c.mode === 'читать-место'; }), 40);
-  check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 66);
-  check('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 20);
-  check('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 17);
+  atLeast('всего карт', K.length, 247);
+  atLeast('наружу', count(function (c) { return c.mode === 'наружу'; }), 79);
+  atLeast('читать место', count(function (c) { return c.mode === 'читать-место'; }), 53);
+  atLeast('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 75);
+  atLeast('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 23);
+  atLeast('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 17);
   check('набор Петербурга', count(function (c) { return c.cityPack === 'спб'; }), 7);
   check('набор Москвы', count(function (c) { return c.cityPack === 'мск'; }), 7);
-  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 211);
+  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), K.length);
   check('у каждой карты есть текст и оборот',
-        count(function (c) { return c.text && c.back; }), 211);
+        count(function (c) { return c.text && c.back; }), K.length);
   check('у всех «наружу» есть уровень',
-        count(function (c) { return c.mode === 'наружу' && c.level; }), 68);
+        count(function (c) { return c.mode === 'наружу' && c.level; }),
+        count(function (c) { return c.mode === 'наружу'; }));
   check('у всех «совместное внимание» есть возраст',
-        count(function (c) { return c.mode === 'совместное-внимание' && c.age; }), 66);
+        count(function (c) { return c.mode === 'совместное-внимание' && c.age; }),
+        count(function (c) { return c.mode === 'совместное-внимание'; }));
   check('у каждой детской карточки есть «если не получается»',
         count(function (c) {
           return c.mode === 'совместное-внимание' && c.age !== 'со-взрослым' && !c.fallback;
         }), 0);
   check('у «со взрослым» подсказки нет: она только для родителя с маленьким ребёнком',
         count(function (c) { return c.age === 'со-взрослым' && c.fallback; }), 0);
-  check('уровни «наружу»', [1, 2, 3].map(function (l) {
-    return count(function (c) { return c.mode === 'наружу' && c.level === l; });
-  }), [24, 30, 14]);
-  check('возрасты', ['2-3', '4-5', '6-8', '9-12', 'со-взрослым'].map(function (a) {
-    return count(function (c) { return c.age === a; });
-  }), [13, 14, 16, 10, 13]);
+  check('у каждой карты известная среда',
+        K.filter(function (c) { return ['город', 'природа', 'везде'].indexOf(c.environment) < 0; }).length, 0);
+  atLeast('уровень 1 «наружу»', count(function (c) { return c.mode === 'наружу' && c.level === 1; }), 32);
+  atLeast('уровень 2 «наружу»', count(function (c) { return c.mode === 'наружу' && c.level === 2; }), 32);
+  atLeast('уровень 3 «наружу»', count(function (c) { return c.mode === 'наружу' && c.level === 3; }), 15);
+  ['2-3', '4-5', '6-8', '9-12', 'со-взрослым'].forEach(function (a) {
+    atLeast('возраст ' + a, count(function (c) { return c.age === a; }), 11);
+  });
+  info('по средам', ['город', 'природа', 'везде'].map(function (e) {
+    return e + ': ' + count(function (c) { return c.environment === e; });
+  }));
   info('требуют памяти о месте',
        K.filter(function (c) { return c.needsHistory; }).map(function (c) { return c.id; }));
   endSection();
@@ -270,6 +281,29 @@ if ('serviceWorker' in navigator) {
   }
   check('новичку — «что изменится первым»', diaryIds(0), ['ПД-08а']);
   check('после трёх сессий — «что изменилось»', diaryIds(5), ['ПД-08б']);
+
+  /* среда: «город» не получает карточек про парк, «природа» — про застройку */
+  var envPool = function (env, mode, extra) {
+    var o = ctx({ mode: mode, light: 'день', season: 'лето', environment: env });
+    for (var k in (extra || {})) o[k] = extra[k];
+    return Deck.pool(K, o);
+  };
+  ['наружу', 'читать-место', 'с-собакой'].forEach(function (mode) {
+    check('«город»: «' + mode + '» без карточек про парк и лес',
+          envPool('город', mode, { level: 1 }).some(function (c) { return c.environment === 'природа'; }), false);
+    check('«природа»: «' + mode + '» без карточек про застройку',
+          envPool('природа', mode, { level: 1 }).some(function (c) { return c.environment === 'город'; }), false);
+  });
+  check('в парке «Читать место» не пусто днём',
+        envPool('природа', 'читать-место').length >= 3, true);
+  check('в парке «Читать место» не пусто в темноте',
+        Deck.pool(K, ctx({ mode: 'читать-место', environment: 'природа' })).length >= 3, true);
+  check('в парке у «Читать место» нет городских наборов',
+        Deck.pool(K, ctx({ mode: 'читать-место', environment: 'природа', light: 'день' }))
+          .some(function (c) { return !!c.cityPack; }), false);
+  check('без выбора среды отдаются все карточки',
+        Deck.pool(K, ctx({ mode: 'читать-место', environment: null, light: 'день' })).length >
+        Deck.pool(K, ctx({ mode: 'читать-место', environment: 'природа', light: 'день' })).length, true);
 
   check('пустой пул возвращает null, а не ошибку',
         Deck.pick(K, ctx({ mode: 'совместное-внимание', age: 'нет такого' })), null);
