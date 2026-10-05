@@ -553,12 +553,7 @@
         }
         var distinct = Object.keys(texts).length;
         check(configs[i][0] + ': карточка выдаётся каждый раз', empty === 0);
-        if (configs[i][0].indexOf('со взрослым') >= 0) {
-          gap(configs[i][0] + ': в тёмный вечер больше двух разных', distinct >= 3,
-              'всего ' + distinct + ' — подходит одна карточка, СВ-51');
-        } else {
-          check(configs[i][0] + ': в тёмный вечер больше двух разных', distinct >= 3, distinct + ' разных');
-        }
+        check(configs[i][0] + ': в тёмный вечер больше двух разных', distinct >= 3, distinct + ' разных');
         close(w);
       }
     });

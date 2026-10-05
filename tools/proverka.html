@@ -87,29 +87,33 @@ if ('serviceWorker' in navigator) {
 
   /* ——— колода ——— */
   section('Колода');
-  check('всего карт', K.length, 197);
+  check('всего карт', K.length, 211);
   check('наружу', count(function (c) { return c.mode === 'наружу'; }), 68);
   check('читать место', count(function (c) { return c.mode === 'читать-место'; }), 40);
-  check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 52);
+  check('совместное внимание', count(function (c) { return c.mode === 'совместное-внимание'; }), 66);
   check('с собакой', count(function (c) { return c.mode === 'с-собакой'; }), 20);
   check('полевой дневник', count(function (c) { return c.mode === 'полевой-дневник'; }), 17);
   check('набор Петербурга', count(function (c) { return c.cityPack === 'спб'; }), 7);
   check('набор Москвы', count(function (c) { return c.cityPack === 'мск'; }), 7);
-  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 197);
+  check('у каждой карты есть свет', count(function (c) { return c.light.length > 0; }), 211);
   check('у каждой карты есть текст и оборот',
-        count(function (c) { return c.text && c.back; }), 197);
+        count(function (c) { return c.text && c.back; }), 211);
   check('у всех «наружу» есть уровень',
         count(function (c) { return c.mode === 'наружу' && c.level; }), 68);
   check('у всех «совместное внимание» есть возраст',
-        count(function (c) { return c.mode === 'совместное-внимание' && c.age; }), 52);
-  check('у всех «совместное внимание» есть «если не пошло»',
-        count(function (c) { return c.mode === 'совместное-внимание' && c.fallback; }), 44);
+        count(function (c) { return c.mode === 'совместное-внимание' && c.age; }), 66);
+  check('у каждой детской карточки есть «если не получается»',
+        count(function (c) {
+          return c.mode === 'совместное-внимание' && c.age !== 'со-взрослым' && !c.fallback;
+        }), 0);
+  check('у «со взрослым» подсказки нет: она только для родителя с маленьким ребёнком',
+        count(function (c) { return c.age === 'со-взрослым' && c.fallback; }), 0);
   check('уровни «наружу»', [1, 2, 3].map(function (l) {
     return count(function (c) { return c.mode === 'наружу' && c.level === l; });
   }), [24, 30, 14]);
-  check('возрасты', ['2-3', '4-5', '6-8', '9-12'].map(function (a) {
+  check('возрасты', ['2-3', '4-5', '6-8', '9-12', 'со-взрослым'].map(function (a) {
     return count(function (c) { return c.age === a; });
-  }), [10, 12, 12, 10]);
+  }), [13, 14, 16, 10, 13]);
   info('требуют памяти о месте',
        K.filter(function (c) { return c.needsHistory; }).map(function (c) { return c.id; }));
   endSection();

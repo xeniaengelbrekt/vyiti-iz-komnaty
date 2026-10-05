@@ -21,10 +21,9 @@ WEATHER = {"ясно", "облачно", "сухо", "дождь", "снег", "
            "оттепель", "свежий-снег", "наст", "ветер", "туман", "неважно"}
 MODALITY = {"зрение", "слух", "обоняние", "температура", "кросс", None}
 
-# Пулы, которые сегодня тоньше трёх карточек в тёмный осенне-зимний вечер.
-# Это известный пробел колоды, а не ошибка кода. Значение — сколько карточек есть.
-# Когда пробел закроют, тест потребует убрать запись отсюда.
-KNOWN_THIN_DARK = {("совместное-внимание", "со-взрослым"): 1}
+# Меньше стольких карточек в любом сочетании «ступень × свет × сезон» — провал.
+# Три — это минимум, при котором семидневное правило не сводит выдачу к одной и той же.
+MIN_POOL = 3
 
 
 def of(mode):
@@ -266,7 +265,7 @@ class Coverage(unittest.TestCase):
         self.assertEqual(empty, [])
 
     def test_adult_tier_exists(self):
-        self.assertEqual(len(groups()[("совместное-внимание", "со-взрослым")]), 8)
+        self.assertGreaterEqual(len(groups()[("совместное-внимание", "со-взрослым")]), 8)
 
     def test_joint_attention_age_order(self):
         order = [a for a in AGES if groups()[("совместное-внимание", a)]]
@@ -300,14 +299,23 @@ class Coverage(unittest.TestCase):
                  if not pool(key, "сумерки", s, city=None)]
         self.assertEqual(empty, [])
 
-    def test_dark_pools_are_not_thin_except_known(self):
-        thin = {}
+    def test_no_pool_is_thinner_than_the_minimum(self):
+        # любая ступень в любой свет и сезон: от темноты до низкого солнца, которое
+        # зимой в Петербурге — это весь световой день (солнце не выше 6,6°)
+        thin = []
         for key in groups():
-            sizes = [len(pool(key, "темнота", s, city=None)) for s in ("осень", "зима")]
-            if min(sizes) < 3:
-                thin[key] = min(sizes)
-        self.assertEqual(thin, KNOWN_THIN_DARK,
-                         "Пул изменился. Если пробел закрыт — уберите запись из KNOWN_THIN_DARK.")
+            for light in ("день", "низкое-солнце", "сумерки", "темнота"):
+                for season in ("зима", "весна", "лето", "осень"):
+                    n = len(pool(key, light, season, city=None))
+                    if n < MIN_POOL:
+                        thin.append((key, light, season, n))
+        self.assertEqual(thin, [])
+
+    def test_dark_evening_pools_have_room_to_vary(self):
+        # ноябрьский вечер: ступени не должны сводиться к трём-четырём карточкам
+        small = {key: min(len(pool(key, "темнота", s, city=None)) for s in ("осень", "зима"))
+                 for key in groups()}
+        self.assertEqual({k: n for k, n in small.items() if n < 4}, {})
 
     def test_history_cards_do_not_starve_a_pool(self):
         # новичок не видит needsHistory; пул без них не должен пустеть
