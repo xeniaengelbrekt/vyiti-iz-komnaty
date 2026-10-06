@@ -453,6 +453,7 @@ input[type="text"]:focus, textarea:focus { border-color: var(--accent-ink); }
   margin: 0 0 3px;
 }
 .why-body p { margin: 0; font-size: 16px; line-height: 1.45; }
+#why-card:not([hidden]) + p { margin-top: 10px; }
 
 /* ——— приветствие: для чего проект и как им пользоваться ——— */
 

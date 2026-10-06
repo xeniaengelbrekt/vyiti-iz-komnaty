@@ -196,6 +196,10 @@
     $('why-criterion').textContent = card.criterion || '';
     $('why-done').hidden = !card.criterion;
     $('why-mode').textContent = WHY[card.mode] || '';
+    /* Объяснение самой карточки читается сразу, а не только после выполнения. */
+    var own = $('why-card');
+    own.textContent = card.back || '';
+    own.hidden = !own.textContent;
     why.hidden = false;
     if (card.fallback) {
       $('card-hint-text').textContent = card.fallback;

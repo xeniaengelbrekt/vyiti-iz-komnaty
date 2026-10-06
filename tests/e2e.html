@@ -360,7 +360,7 @@
             /Что считается выполненным/i.test(why) && /Зачем такие задания/i.test(why));
       check('критерий берётся из карточки', !c2.criterion || why.indexOf(c2.criterion) >= 0);
       check('текст режима «Наружу»', /уводит внимание с себя/.test(why));
-      check('оборот карточки там не показан', why.indexOf(c2.back.slice(0, 40)) < 0);
+      check('объяснение карточки там есть', why.indexOf(c2.back.slice(0, 40)) >= 0);
       check('задание осталось на экране целиком', q(w, '#card-text').getBoundingClientRect().top >= 0);
       check('прокрутки нет', w.document.documentElement.scrollHeight - w.innerHeight <= 8,
             (w.document.documentElement.scrollHeight - w.innerHeight) + ' px');
@@ -387,6 +387,23 @@
         click(w, '#card-why summary'); await sleep(200);
         check(mode, expect[mode].test(words(q(w, '#why-mode'))), words(q(w, '#why-mode')));
         close(w);
+      }
+    });
+
+    await scenario('«Зачем это»: объяснение самой карточки во всех режимах', async function () {
+      var modes = ['наружу', 'читать-место', 'совместное-внимание', 'с-собакой', 'полевой-дневник'];
+      for (var i = 0; i < modes.length; i++) {
+        seed({ mode: modes[i], level: 1, age: '6-8' });
+        var d = await open();
+        await take(d);
+        click(d, '#card-why summary'); await sleep(200);
+        var card = cardNow(d);
+        check(modes[i] + ': объяснение карточки показано', !!card && !q(d, '#why-card').hidden
+              && words(q(d, '#why-card')) === card.back, words(q(d, '#why-card')));
+        check(modes[i] + ': общий текст режима остался', words(q(d, '#why-mode')).length > 20);
+        check(modes[i] + ': объяснение стоит выше общего текста',
+              q(d, '#why-card').getBoundingClientRect().bottom <= q(d, '#why-mode').getBoundingClientRect().top);
+        close(d);
       }
     });
 
